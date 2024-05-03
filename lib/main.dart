@@ -2,7 +2,7 @@ import 'package:bisleriumbloggers/utilities/helpers/app_colors.dart';
 import 'package:bisleriumbloggers/utilities/routes/route_config.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Bislerium Bloggers',
       theme: ThemeData(
-        scaffoldBackgroundColor: Bislerium.whiteColor,
+        scaffoldBackgroundColor: Bislerium.backgroundColor,
       ),
       routeInformationParser:
           AppRouter.returnRouter(false).routeInformationParser,

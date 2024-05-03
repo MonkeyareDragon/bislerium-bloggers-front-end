@@ -1,5 +1,6 @@
-import 'package:bisleriumbloggers/screens/Authentication/login_screen.dart';
-import 'package:bisleriumbloggers/screens/Authentication/signup_screen.dart';
+import 'package:bisleriumbloggers/screens/Authentication/login_page.dart';
+import 'package:bisleriumbloggers/screens/Authentication/set_username_page.dart';
+import 'package:bisleriumbloggers/screens/Authentication/signup_page.dart';
 import 'package:bisleriumbloggers/screens/test/about.dart';
 import 'package:bisleriumbloggers/screens/test/contact_us.dart';
 import 'package:bisleriumbloggers/screens/test/error_page.dart';
@@ -24,14 +25,24 @@ class AppRouter {
           name: AppRouteConstants.loginRouteName,
           path: '/login',
           pageBuilder: (context, state) {
-            return const MaterialPage(child: LoginScreen());
+            return const MaterialPage(child: LoginPage());
           },
         ),
         GoRoute(
           name: AppRouteConstants.registerRouteName,
-          path: '/register',
+          path: '/register/:username',
           pageBuilder: (context, state) {
-            return const MaterialPage(child: RegisterScreen());
+            return MaterialPage(
+                child: RegisterPage(
+              username: state.params['username']!,
+            ));
+          },
+        ),
+        GoRoute(
+          name: AppRouteConstants.usernameRouteName,
+          path: '/username',
+          pageBuilder: (context, state) {
+            return const MaterialPage(child: SetUsernamePage());
           },
         ),
         GoRoute(

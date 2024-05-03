@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 
 class GradientButton extends StatelessWidget {
   final String buttonText;
+  final VoidCallback onPressed;
+
   const GradientButton({
     super.key,
     required this.buttonText,
+    required this.onPressed,
   });
 
   @override
@@ -24,7 +27,7 @@ class GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(7),
       ),
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           fixedSize: const Size(395, 55),
           backgroundColor: Colors.transparent,

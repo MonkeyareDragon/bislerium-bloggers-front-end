@@ -3,9 +3,16 @@ import 'package:flutter/material.dart';
 
 class LoginField extends StatelessWidget {
   final String hintText;
+  final TextEditingController? controller;
+  final TextInputType? keywordtype;
+  final bool obscureText;
+
   const LoginField({
     super.key,
     required this.hintText,
+    required this.controller,
+    this.keywordtype,
+    this.obscureText = false,
   });
 
   @override
@@ -15,6 +22,9 @@ class LoginField extends StatelessWidget {
         maxWidth: 400,
       ),
       child: TextFormField(
+        controller: controller,
+        keyboardType: keywordtype,
+        obscureText: obscureText,
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.all(27),
           enabledBorder: OutlineInputBorder(
