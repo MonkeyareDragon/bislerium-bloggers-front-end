@@ -39,6 +39,42 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> fetchRandomBlogs() async {
+    try {
+      List<Blog> posts = await fetchRandomBlogsDetails();
+      setState(() {
+        blogPosts = posts;
+        totalPages = (blogPosts.length / 5).ceil();
+      });
+    } catch (e) {
+      print('Error fetching random blogs: $e');
+    }
+  }
+
+  Future<void> fetchPopularBlogs() async {
+    try {
+      List<Blog> posts = await fetchPopularBlogsDetails();
+      setState(() {
+        blogPosts = posts;
+        totalPages = (blogPosts.length / 5).ceil();
+      });
+    } catch (e) {
+      print('Error fetching popular blogs: $e');
+    }
+  }
+
+  Future<void> fetchNoRecentBlogs() async {
+    try {
+      List<Blog> posts = await fetchNoRecentBlogsDetails();
+      setState(() {
+        blogPosts = posts;
+        totalPages = (blogPosts.length / 5).ceil();
+      });
+    } catch (e) {
+      print('Error fetching no recent blogs: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Blog> paginatedPosts =
@@ -88,7 +124,18 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Search(),
                 SizedBox(height: BisleriumConstant.kDefaultPadding),
-                Categories(),
+                Categories(
+                  onCategorySelected: (category) {
+                    // Call the appropriate method based on the selected category
+                    if (category == 'Random') {
+                      fetchRandomBlogs();
+                    } else if (category == 'Popularity') {
+                      fetchPopularBlogs();
+                    } else if (category == 'Recency') {
+                      fetchNoRecentBlogs();
+                    }
+                  },
+                ),
               ],
             ),
           ),

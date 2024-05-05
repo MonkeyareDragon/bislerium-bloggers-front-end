@@ -1,12 +1,19 @@
-import 'package:bisleriumbloggers/utilities/helpers/app_colors.dart';
-import 'package:bisleriumbloggers/utilities/helpers/constants.dart';
 import 'package:flutter/material.dart';
-import 'sidebar_container.dart';
+import 'package:bisleriumbloggers/utilities/helpers/constants.dart';
+import 'package:bisleriumbloggers/utilities/widgets/sidebar_container.dart';
 
-class Categories extends StatelessWidget {
-  const Categories({
-    Key? key,
-  }) : super(key: key);
+class Categories extends StatefulWidget {
+  final Function(String) onCategorySelected;
+
+  const Categories({Key? key, required this.onCategorySelected})
+      : super(key: key);
+
+  @override
+  State<Categories> createState() => _CategoriesState();
+}
+
+class _CategoriesState extends State<Categories> {
+  String selectedCategory = 'Random'; // Default category
 
   @override
   Widget build(BuildContext context) {
@@ -18,32 +25,51 @@ class Categories extends StatelessWidget {
           Category(
             title: 'Random',
             numOfItems: 10,
-            press: () {},
+            isSelected: selectedCategory == 'Random',
+            press: () {
+              selectCategory('Random');
+            },
           ),
           Category(
             title: 'Popularity',
             numOfItems: 10,
-            press: () {},
+            isSelected: selectedCategory == 'Popularity',
+            press: () {
+              selectCategory('Popularity');
+            },
           ),
           Category(
             title: 'Recency',
             numOfItems: 10,
-            press: () {},
+            isSelected: selectedCategory == 'Recency',
+            press: () {
+              selectCategory('Recency');
+            },
           ),
         ],
       ),
     );
+  }
+
+  void selectCategory(String category) {
+    setState(() {
+      selectedCategory = category;
+    });
+    widget.onCategorySelected(category); // Call the callback function
   }
 }
 
 class Category extends StatelessWidget {
   final String title;
   final int numOfItems;
+  final bool isSelected;
   final VoidCallback press;
+
   const Category({
     Key? key,
     required this.title,
     required this.numOfItems,
+    required this.isSelected,
     required this.press,
   }) : super(key: key);
 
@@ -51,17 +77,30 @@ class Category extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-          vertical: BisleriumConstant.kDefaultPadding / 4),
+        vertical: BisleriumConstant.kDefaultPadding / 4,
+      ),
       child: TextButton(
-        onPressed: () {},
+        onPressed: press,
+        style: ButtonStyle(
+          backgroundColor: isSelected
+              ? MaterialStateProperty.all<Color>(
+                  Colors.blue.withOpacity(0.1),
+                )
+              : null,
+        ),
         child: Text.rich(
           TextSpan(
             text: title,
-            style: TextStyle(color: BisleriumColor.kDarkBlackColor),
+            style: TextStyle(
+              color: isSelected ? Colors.blue : Colors.black,
+            ),
             children: [
               TextSpan(
                 text: " ($numOfItems)",
-                style: TextStyle(color: BisleriumColor.kBodyTextColor),
+                style: TextStyle(
+                  color:
+                      isSelected ? Colors.blue.withOpacity(0.5) : Colors.grey,
+                ),
               ),
             ],
           ),
