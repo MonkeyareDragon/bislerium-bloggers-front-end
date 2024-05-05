@@ -43,6 +43,28 @@ class _Socal extends State<Socal> {
     String isToken = session?.accessToken ?? '';
     return Row(
       children: [
+        GestureDetector(
+          onTap: () {
+            GoRouter.of(context).push(Uri(path: '/submit').toString());
+          },
+          child: const Row(
+            children: [
+              Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Create',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(width: BisleriumConstant.kDefaultPadding), // Add spacing
         if (!Responsive.isMobile(context))
           SvgPicture.asset("assets/icons/behance-alt.svg"),
         if (!Responsive.isMobile(context))

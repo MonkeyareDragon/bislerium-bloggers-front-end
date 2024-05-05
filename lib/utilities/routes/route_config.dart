@@ -1,6 +1,7 @@
 import 'package:bisleriumbloggers/screens/Authentication/login_page.dart';
 import 'package:bisleriumbloggers/screens/Authentication/set_username_page.dart';
 import 'package:bisleriumbloggers/screens/Authentication/signup_page.dart';
+import 'package:bisleriumbloggers/screens/Blog/add_post.dart';
 import 'package:bisleriumbloggers/screens/Blog/blog_page.dart';
 import 'package:bisleriumbloggers/screens/test/about.dart';
 import 'package:bisleriumbloggers/screens/test/contact_us.dart';
@@ -36,6 +37,13 @@ class AppRouter {
                 child: RegisterPage(
               username: state.params['username']!,
             ));
+          },
+        ),
+        GoRoute(
+          name: AppRouteConstants.submitRouteName,
+          path: '/submit',
+          pageBuilder: (context, state) {
+            return const MaterialPage(child: SubmitPost());
           },
         ),
         GoRoute(
