@@ -58,7 +58,7 @@ class _LoginPage extends State<LoginPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -68,6 +68,7 @@ class _LoginPage extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: BisleriumColor.backgroundColor,
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -77,7 +78,7 @@ class _LoginPage extends State<LoginPage> {
                 'Log In.',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Bislerium.whiteColor,
+                  color: BisleriumColor.whiteColor,
                   fontSize: 50,
                 ),
               ),
@@ -101,7 +102,7 @@ class _LoginPage extends State<LoginPage> {
                     'New to Bislerium Bloggers? ',
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      color: Bislerium.whiteColor,
+                      color: BisleriumColor.whiteColor,
                       fontSize: 15,
                     ),
                   ),
@@ -114,10 +115,10 @@ class _LoginPage extends State<LoginPage> {
                       'Sign up',
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
-                        color: Bislerium.gradient2,
+                        color: BisleriumColor.gradient2,
                         fontSize: 15,
                         decoration: TextDecoration.underline,
-                        decorationColor: Bislerium.gradient2,
+                        decorationColor: BisleriumColor.gradient2,
                       ),
                     ),
                   ),

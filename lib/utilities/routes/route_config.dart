@@ -1,10 +1,10 @@
 import 'package:bisleriumbloggers/screens/Authentication/login_page.dart';
 import 'package:bisleriumbloggers/screens/Authentication/set_username_page.dart';
 import 'package:bisleriumbloggers/screens/Authentication/signup_page.dart';
+import 'package:bisleriumbloggers/screens/Blog/blog_page.dart';
 import 'package:bisleriumbloggers/screens/test/about.dart';
 import 'package:bisleriumbloggers/screens/test/contact_us.dart';
 import 'package:bisleriumbloggers/screens/test/error_page.dart';
-import 'package:bisleriumbloggers/screens/test/home.dart';
 import 'package:bisleriumbloggers/screens/test/profile.dart';
 import 'package:bisleriumbloggers/utilities/routes/route_constants.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +18,7 @@ class AppRouter {
           name: AppRouteConstants.homeRouteName,
           path: '/',
           pageBuilder: (context, state) {
-            return MaterialPage(child: Home());
+            return const MaterialPage(child: BlogPage());
           },
         ),
         GoRoute(

@@ -13,11 +13,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Bislerium Bloggers',
       theme: ThemeData(
-        scaffoldBackgroundColor: Bislerium.backgroundColor,
+        scaffoldBackgroundColor: BisleriumColor.whiteColor,
       ),
       routeInformationParser:
-          AppRouter.returnRouter(false).routeInformationParser,
-      routerDelegate: AppRouter.returnRouter(false).routerDelegate,
+          AppRouter.returnRouter(true).routeInformationParser,
+      routerDelegate: AppRouter.returnRouter(true).routerDelegate,
     );
   }
 }

@@ -59,9 +59,6 @@ Future<Map<String, dynamic>> register(String username, String email,
   );
 
   if (response.statusCode == 200) {
-    // Successful register
-    final Map<String, dynamic> responseData = jsonDecode(response.body);
-    print(responseData); // Print the response data
     return {'success': true, "detail": "Verification email sent."};
   } else {
     print('Error: ${response.statusCode} - ${response.body}');

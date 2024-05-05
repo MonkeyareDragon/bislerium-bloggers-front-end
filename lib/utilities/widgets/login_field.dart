@@ -29,22 +29,23 @@ class LoginField extends StatelessWidget {
           contentPadding: const EdgeInsets.all(27),
           enabledBorder: OutlineInputBorder(
             borderSide: const BorderSide(
-              color: Bislerium.borderColor,
+              color: BisleriumColor.borderColor,
               width: 3,
             ),
             borderRadius: BorderRadius.circular(10),
           ),
           focusedBorder: OutlineInputBorder(
             borderSide: const BorderSide(
-              color: Bislerium.gradient2,
+              color: BisleriumColor.gradient2,
               width: 3,
             ),
             borderRadius: BorderRadius.circular(10),
           ),
           hintText: hintText,
-          hintStyle: TextStyle(color: Bislerium.whiteColor.withOpacity(0.4)),
+          hintStyle:
+              TextStyle(color: BisleriumColor.whiteColor.withOpacity(0.4)),
         ),
-        style: const TextStyle(color: Bislerium.whiteColor),
+        style: const TextStyle(color: BisleriumColor.whiteColor),
       ),
     );
   }

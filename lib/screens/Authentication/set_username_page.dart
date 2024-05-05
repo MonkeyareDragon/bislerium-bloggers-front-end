@@ -23,6 +23,7 @@ class _SetUsernamePage extends State<SetUsernamePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: BisleriumColor.backgroundColor,
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -32,7 +33,7 @@ class _SetUsernamePage extends State<SetUsernamePage> {
                 'Set Your Username.',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Bislerium.whiteColor,
+                  color: BisleriumColor.whiteColor,
                   fontSize: 45,
                 ),
               ),
