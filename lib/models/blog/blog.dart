@@ -1,3 +1,5 @@
+import 'package:bisleriumbloggers/utilities/helpers/url_helper.dart';
+
 class Blog {
   int? voteCount, commentCount;
   String? id, author, createDate, updateDate, title, description, image;
@@ -11,7 +13,9 @@ class Blog {
       this.description,
       this.image,
       this.voteCount,
-      this.commentCount});
+      this.commentCount}) {
+    image = UrlUtil.getImageUrl(image!);
+  }
 
   factory Blog.fromJson(Map<String, dynamic> json) {
     return Blog(

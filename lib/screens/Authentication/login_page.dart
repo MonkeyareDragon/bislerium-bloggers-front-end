@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:bisleriumbloggers/controllers/Authentication/Auth_apis.dart';
+import 'package:bisleriumbloggers/models/session/user_session.dart';
 import 'package:bisleriumbloggers/utilities/helpers/app_colors.dart';
+import 'package:bisleriumbloggers/utilities/helpers/sesson_helper.dart';
 import 'package:bisleriumbloggers/utilities/widgets/gradient_button.dart';
 import 'package:bisleriumbloggers/utilities/widgets/login_field.dart';
 import 'package:flutter/material.dart';
@@ -32,10 +34,9 @@ class _LoginPage extends State<LoginPage> {
     final Map<String, dynamic> result = await login(email, password);
 
     if (result['success']) {
-      print('Login successful! Token: ${result['token']}');
+      GoRouter.of(context).push(Uri(path: '/').toString());
     } else {
       String errorMessage = 'Invalid credentials';
-      print(result);
       final errorBody = jsonDecode(result['error']);
 
       if (errorBody.containsKey('errors')) {

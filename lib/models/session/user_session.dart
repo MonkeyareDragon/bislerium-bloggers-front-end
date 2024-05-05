@@ -1,5 +1,5 @@
 class UserSession {
-  final int userId;
+  final String userId;
   final String accessToken;
   final String email;
   final String username;
@@ -14,19 +14,19 @@ class UserSession {
 
   factory UserSession.fromJson(Map<String, dynamic> json) {
     return UserSession(
-        userId: json['userId'],
-        accessToken: json['accessToken'],
+        userId: json['id'],
+        accessToken: json['token'],
         email: json['email'],
-        username: json['username'],
+        username: json['name'],
         role: json['role']);
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'userId': userId,
-      'accessToken': accessToken,
+      'id': userId,
+      'token': accessToken,
       'email': email,
-      'username': username,
+      'name': username,
       'role': role
     };
   }

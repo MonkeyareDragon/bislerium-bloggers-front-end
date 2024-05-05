@@ -28,7 +28,7 @@ class _BlogPostCardState extends State<BlogPostCard> {
         children: [
           AspectRatio(
             aspectRatio: 1.78,
-            child: Image.asset(widget.blog.image!),
+            child: Image.network(widget.blog.image!),
           ),
           Container(
             padding: EdgeInsets.all(BisleriumConstant.kDefaultPadding),
@@ -54,7 +54,7 @@ class _BlogPostCardState extends State<BlogPostCard> {
                     ),
                     SizedBox(width: BisleriumConstant.kDefaultPadding),
                     Text(
-                      widget.blog.updateDate!,
+                      widget.blog.createDate ?? "No Date",
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],
@@ -63,7 +63,7 @@ class _BlogPostCardState extends State<BlogPostCard> {
                   padding: const EdgeInsets.symmetric(
                       vertical: BisleriumConstant.kDefaultPadding),
                   child: Text(
-                    widget.blog.title!,
+                    widget.blog.title ?? 'No Title',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(

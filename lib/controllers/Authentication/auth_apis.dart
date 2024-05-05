@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:bisleriumbloggers/models/session/user_session.dart';
+import 'package:bisleriumbloggers/utilities/helpers/session_manager.dart';
 import 'package:bisleriumbloggers/utilities/helpers/url_helper.dart';
 import 'package:http/http.dart' as http;
 
@@ -23,21 +25,21 @@ Future<Map<String, dynamic>> login(String email, String password) async {
     // Successful login
     final Map<String, dynamic> responseData = jsonDecode(response.body);
     print(responseData); // Print the response data
-    // int userId = responseData['user_id'];
-    // String accessToken = responseData['access'];
-    // String firstName = responseData['first_name'];
-    // String lastName = responseData['last_name'];
+    String userId = responseData['id'];
+    String accessToken = responseData['token'];
+    String email = responseData['email'];
+    String username = responseData['name'];
+    String role = responseData['role'];
 
-    // await SessionManager.saveSession(UserSession(
-    //   userId: userId,
-    //   accessToken: accessToken,
-    //   firstName: firstName,
-    //   lastName: lastName,
-    // ));
+    await SessionManager.saveSession(UserSession(
+        userId: userId,
+        accessToken: accessToken,
+        email: email,
+        username: username,
+        role: role));
 
     return {'success': true, 'token': responseData['access']};
   } else {
-    print('Error: ${response.statusCode} - ${response.body}');
     return {'success': false, 'error': response.body};
   }
 }
