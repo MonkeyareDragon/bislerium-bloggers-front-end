@@ -20,7 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
-  static GoRouter returnRouter(bool isAuth) {
+  static GoRouter returnRouter(bool isAuth, bool isAdmin) {
     GoRouter router = GoRouter(
       routes: [
         GoRoute(
@@ -154,9 +154,7 @@ class AppRouter {
         return MaterialPage(child: ErrorPage());
       },
       redirect: (context, state) {
-        if (!isAuth &&
-            state.location
-                .startsWith('/${AppRouteConstants.profileRouteName}')) {
+        if (!isAuth && state.location != '/') {
           return context.namedLocation(AppRouteConstants.loginRouteName);
         } else {
           return null;

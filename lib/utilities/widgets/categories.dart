@@ -24,7 +24,7 @@ class _CategoriesState extends State<Categories> {
         children: [
           Category(
             title: 'Random',
-            numOfItems: 10,
+            numOfItems: 5,
             isSelected: selectedCategory == 'Random',
             press: () {
               selectCategory('Random');
@@ -32,7 +32,7 @@ class _CategoriesState extends State<Categories> {
           ),
           Category(
             title: 'Popularity',
-            numOfItems: 10,
+            numOfItems: 5,
             isSelected: selectedCategory == 'Popularity',
             press: () {
               selectCategory('Popularity');
@@ -40,7 +40,7 @@ class _CategoriesState extends State<Categories> {
           ),
           Category(
             title: 'Recency',
-            numOfItems: 10,
+            numOfItems: 5,
             isSelected: selectedCategory == 'Recency',
             press: () {
               selectCategory('Recency');

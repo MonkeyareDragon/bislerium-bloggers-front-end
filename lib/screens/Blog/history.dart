@@ -3,35 +3,23 @@ import 'package:flutter/material.dart';
 class HistoryPage extends StatelessWidget {
   final List<Map<String, String>> _historyItems = [
     {
-      'date': 'May 5, 2024',
+      'date': 'May 9, 2024',
       'original': 'This is original',
       'update': 'Fixed a bug in the login page',
       'tags': '#blog',
     },
     {
-      'date': 'May 4, 2024',
-      'original': 'This is original',
-      'update': 'Added a new feature to the profile page',
+      'date': 'May 9, 2024',
+      'original': 'This is Test Comment',
+      'update': 'Update test comment',
       'tags': '#comment',
     },
     {
-      'date': 'May 3, 2024',
+      'date': 'May 9, 2024',
       'original': 'This is original',
-      'update': 'Improved performance of the search page',
+      'update': 'Very helpfull comment.',
       'tags': '#comment',
-    },
-    {
-      'date': 'May 2, 2024',
-      'original': 'This is original',
-      'update': 'Added a new design to the home page',
-      'tags': '#comment',
-    },
-    {
-      'date': 'May 1, 2024',
-      'original': 'This is original',
-      'update': 'Fixed a typo in the onboarding screens',
-      'tags': '#blog',
-    },
+    }
   ];
 
   @override

@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 class NotificationPage extends StatelessWidget {
   final List<Map<String, dynamic>> _notifications = [
     {
-      'image': 'https://picsum.photos/id/1015/100/100',
-      'date': 'Today, 10:00 AM',
-      'note': 'This is my first notification!',
+      'image':
+          'https://ideausher.com/wp-content/uploads/2023/11/Augmented-reality-in-the-retail-industry-use-cases-and-real-life-examples-1.webp',
+      'date': 'Today, 8:28 PM',
+      'note': 'TestUser have comment on your blog!',
     },
     {
-      'image': 'https://picsum.photos/id/1016/100/100',
-      'date': 'Yesterday, 5:00 PM',
-      'note': 'This is my second notification!',
+      'image':
+          'https://ideausher.com/wp-content/uploads/2023/11/Augmented-reality-in-the-retail-industry-use-cases-and-real-life-examples-1.webp',
+      'date': 'Today, 8:20 PM',
+      'note': 'TestUser have like on your blog!',
     },
     // Add more notifications here...
   ];

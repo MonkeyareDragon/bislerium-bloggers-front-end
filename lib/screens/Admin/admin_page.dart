@@ -491,7 +491,7 @@ class _AdminPage extends State<AdminPage> {
                               height: 10.0,
                             ),
                             Text(
-                              "3 new Articles",
+                              "2 new Articles",
                               style: TextStyle(
                                   color: Colors.grey,
                                   fontSize: 18.0,
@@ -627,7 +627,7 @@ class _AdminPage extends State<AdminPage> {
                               height: 10.0,
                             ),
                             Text(
-                              "3 new Articles",
+                              "2 new Blogger",
                               style: TextStyle(
                                   color: Colors.grey,
                                   fontSize: 18.0,
@@ -645,19 +645,6 @@ class _AdminPage extends State<AdminPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        TextButton.icon(
-                          onPressed: () {},
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: Colors.deepPurple.shade400,
-                          ),
-                          label: Text(
-                            "2022, July 14 -- 2022, July 16",
-                            style: TextStyle(
-                              color: Colors.deepPurple.shade400,
-                            ),
-                          ),
-                        ),
                         Row(
                           children: [
                             DropdownButton(
@@ -668,8 +655,8 @@ class _AdminPage extends State<AdminPage> {
                                     child: Text("All Time"),
                                   ),
                                   DropdownMenuItem(
-                                    value: "Certain Date",
-                                    child: Text("Certain Date"),
+                                    value: "Monthly",
+                                    child: Text("Monthly"),
                                   ),
                                 ],
                                 onChanged: (value) {}),
@@ -692,37 +679,28 @@ class _AdminPage extends State<AdminPage> {
                               (states) => Colors.grey.shade200),
                           columns: [
                             DataColumn(label: Text("ID")),
-                            DataColumn(label: Text("Article Title")),
+                            DataColumn(label: Text("Username")),
                             DataColumn(label: Text("Creation Date")),
-                            DataColumn(label: Text("Views")),
-                            DataColumn(label: Text("Comments")),
+                            DataColumn(label: Text("Popularity")),
+                            DataColumn(label: Text("Total Post")),
                           ],
                           rows: [
                             DataRow(cells: [
-                              DataCell(Text("0")),
-                              DataCell(Text("How to build a Flutter Web App")),
+                              DataCell(
+                                  Text("4e941b16-f47b-4e88-9e98-55db0918bc34")),
+                              DataCell(Text("Tester")),
                               DataCell(Text("${DateTime.now()}")),
-                              DataCell(Text("2.3K Views")),
-                              DataCell(Text("102Comments")),
+                              DataCell(Text("2")),
+                              DataCell(Text("2")),
                             ]),
                             DataRow(cells: [
-                              DataCell(Text("1")),
                               DataCell(
-                                  Text("How to build a Flutter Mobile App")),
+                                  Text("1501f9b0-4050-4780-bda7-318290465432")),
+                              DataCell(Text("TestUser")),
                               DataCell(Text("${DateTime.now()}")),
-                              DataCell(Text("21.3K Views")),
-                              DataCell(Text("1020Comments")),
+                              DataCell(Text("0")),
+                              DataCell(Text("0")),
                             ]),
-                            DataRow(
-                              cells: [
-                                DataCell(Text("2")),
-                                DataCell(
-                                    Text("Flutter for your first project")),
-                                DataCell(Text("${DateTime.now()}")),
-                                DataCell(Text("2.3M Views")),
-                                DataCell(Text("10K Comments")),
-                              ],
-                            ),
                           ],
                         ),
                         //Now let's set the pagination

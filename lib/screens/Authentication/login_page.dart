@@ -102,7 +102,7 @@ class _LoginPage extends State<LoginPage> {
                 controller: passwordController,
                 obscureText: !_isPasswordVisible,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -132,11 +132,28 @@ class _LoginPage extends State<LoginPage> {
                   ),
                 ],
               ),
+              const SizedBox(height: 15),
+              GestureDetector(
+                onTap: () {
+                  GoRouter.of(context).push(Uri(path: '/username').toString());
+                },
+                child: const Text(
+                  'Forgot Password ?',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: BisleriumColor.gradient2,
+                    fontSize: 15,
+                    decoration: TextDecoration.underline,
+                    decorationColor: BisleriumColor.gradient2,
+                  ),
+                ),
+              ),
               const SizedBox(height: 20),
               GradientButton(
                 buttonText: "Log In",
                 onPressed: _login,
               ),
+              const SizedBox(height: 15),
             ],
           ),
         ),

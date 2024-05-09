@@ -1,3 +1,4 @@
+import 'package:bisleriumbloggers/utilities/routes/route_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
 import 'package:go_router/go_router.dart';
@@ -9,7 +10,7 @@ class NavigationService {
         GoRouter.of(context).push(Uri(path: '/').toString());
         break;
       case 1:
-        GoRouter.of(context).push(Uri(path: '/dashboard').toString());
+        GoRouter.of(context).pushNamed(AppRouteConstants.dashboardRouteName);
         break;
       case 2:
         GoRouter.of(context).push(Uri(path: '/notification').toString());
