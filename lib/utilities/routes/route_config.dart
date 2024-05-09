@@ -1,7 +1,9 @@
+import 'package:bisleriumbloggers/screens/Admin/admin_page.dart';
 import 'package:bisleriumbloggers/screens/Authentication/login_page.dart';
 import 'package:bisleriumbloggers/screens/Authentication/set_username_page.dart';
 import 'package:bisleriumbloggers/screens/Authentication/signup_page.dart';
 import 'package:bisleriumbloggers/screens/Blog/add_post.dart';
+import 'package:bisleriumbloggers/screens/Blog/blog_details_page.dart';
 import 'package:bisleriumbloggers/screens/Blog/blog_page.dart';
 import 'package:bisleriumbloggers/screens/test/about.dart';
 import 'package:bisleriumbloggers/screens/test/contact_us.dart';
@@ -20,6 +22,16 @@ class AppRouter {
           path: '/',
           pageBuilder: (context, state) {
             return const MaterialPage(child: BlogPage());
+          },
+        ),
+        GoRoute(
+          name: AppRouteConstants.blogDetailsRouteName,
+          path: '/details/:blogid',
+          pageBuilder: (context, state) {
+            return MaterialPage(
+                child: BlogDetailsPage(
+              blogid: state.params['blogid']!,
+            ));
           },
         ),
         GoRoute(
@@ -44,6 +56,13 @@ class AppRouter {
           path: '/submit',
           pageBuilder: (context, state) {
             return const MaterialPage(child: SubmitPost());
+          },
+        ),
+        GoRoute(
+          name: AppRouteConstants.dashboardRouteName,
+          path: '/dashboard',
+          pageBuilder: (context, state) {
+            return const MaterialPage(child: AdminPage());
           },
         ),
         GoRoute(

@@ -4,6 +4,7 @@ import 'package:bisleriumbloggers/utilities/helpers/app_colors.dart';
 import 'package:bisleriumbloggers/utilities/helpers/constants.dart';
 import 'package:bisleriumbloggers/utilities/helpers/responsive.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
 class BlogPostCard extends StatefulWidget {
   final Blog blog;
@@ -84,7 +85,11 @@ class _BlogPostCardState extends State<BlogPostCard> {
                 Row(
                   children: [
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        GoRouter.of(context).push(Uri(
+                          path: '/details/${widget.blog.id}',
+                        ).toString());
+                      },
                       child: Container(
                         padding: EdgeInsets.only(
                             bottom: BisleriumConstant.kDefaultPadding / 4),

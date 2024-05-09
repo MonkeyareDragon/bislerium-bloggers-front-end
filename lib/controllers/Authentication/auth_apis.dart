@@ -4,10 +4,8 @@ import 'package:bisleriumbloggers/utilities/helpers/session_manager.dart';
 import 'package:bisleriumbloggers/utilities/helpers/url_helper.dart';
 import 'package:http/http.dart' as http;
 
-Future<Map<String, dynamic>> login(String email, String password) async {
-  print(
-    ApiUrlHelper.buildUrl('/api/Account/login'),
-  );
+Future<Map<String, dynamic>> login(
+    String username, String email, String password) async {
   final response = await http.post(
     ApiUrlHelper.buildUrl('api/Account/login'),
     headers: <String, String>{
@@ -16,10 +14,8 @@ Future<Map<String, dynamic>> login(String email, String password) async {
     body: jsonEncode(<String, String>{
       'email': email,
       'password': password,
+      "username": username
     }),
-  );
-  print(
-    ApiUrlHelper.buildUrl('/api/Account/login'),
   );
   if (response.statusCode == 200) {
     // Successful login

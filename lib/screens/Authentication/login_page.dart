@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:bisleriumbloggers/controllers/Authentication/Auth_apis.dart';
-import 'package:bisleriumbloggers/models/session/user_session.dart';
 import 'package:bisleriumbloggers/utilities/helpers/app_colors.dart';
-import 'package:bisleriumbloggers/utilities/helpers/sesson_helper.dart';
 import 'package:bisleriumbloggers/utilities/widgets/gradient_button.dart';
 import 'package:bisleriumbloggers/utilities/widgets/login_field.dart';
 import 'package:flutter/material.dart';
@@ -19,19 +17,22 @@ class _LoginPage extends State<LoginPage> {
   bool _isPasswordVisible = false;
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final usernameController = TextEditingController();
 
   @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
+    usernameController.dispose();
     super.dispose();
   }
 
   Future<void> _login() async {
     final String email = emailController.text.trim();
     final String password = passwordController.text.trim();
+    final String username = usernameController.text.trim();
 
-    final Map<String, dynamic> result = await login(email, password);
+    final Map<String, dynamic> result = await login(username, email, password);
 
     if (result['success']) {
       GoRouter.of(context).push(Uri(path: '/').toString());
@@ -88,6 +89,12 @@ class _LoginPage extends State<LoginPage> {
                 hintText: 'Email',
                 controller: emailController,
                 keywordtype: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 15),
+              LoginField(
+                hintText: 'Username',
+                controller: usernameController,
+                keywordtype: TextInputType.text,
               ),
               const SizedBox(height: 15),
               LoginField(
