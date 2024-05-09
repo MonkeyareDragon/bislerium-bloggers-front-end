@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:bisleriumbloggers/controllers/Dashboard/dashboard_apis.dart';
 import 'package:bisleriumbloggers/models/dashboard/dashboard_count.dart';
 import 'package:bisleriumbloggers/models/dashboard/dashboard_post.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AdminPage extends StatefulWidget {
   const AdminPage({Key? key}) : super(key: key);
@@ -22,7 +21,6 @@ class _AdminPage extends State<AdminPage> {
   DashboardCounts? countData;
   int? _selectedPostMonth;
   late List<PostSummaryDTO> _popularPosts = [];
-  late bool _isLoading = true;
 
   @override
   void initState() {
@@ -71,9 +69,7 @@ class _AdminPage extends State<AdminPage> {
   Future<void> fetchPopularPostsAllTimeScreen() async {
     try {
       _popularPosts = await fetchPopularPostsAllTime();
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() {});
     } catch (e) {
       print('Failed to load popular posts: $e');
       // Handle error
@@ -101,8 +97,8 @@ class _AdminPage extends State<AdminPage> {
                   label: Text("Home"),
                 ),
                 NavigationRailDestination(
-                  icon: Icon(Icons.bar_chart),
-                  label: Text("Reports"),
+                  icon: Icon(Icons.add_box),
+                  label: Text("Add Admin"),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.person),
@@ -137,6 +133,18 @@ class _AdminPage extends State<AdminPage> {
                           backgroundImage: NetworkImage(
                               "https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg"),
                           radius: 26.0,
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            GoRouter.of(context)
+                                .push(Uri(path: '/addAdmin').toString());
+                          },
+                          child: Text(
+                            'Add Admin',
+                            style: TextStyle(
+                              color: Colors.deepPurple,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -552,15 +560,13 @@ class _AdminPage extends State<AdminPage> {
                                   if (_selectedPostMonth != null) {
                                     try {
                                       setState(() {
-                                        _isLoading =
-                                            true; // Show loading indicator
+// Show loading indicator
                                       });
                                       _popularPosts =
                                           await getPopularPostsChosenMonth(
                                               _selectedPostMonth!);
                                       setState(() {
-                                        _isLoading =
-                                            false; // Hide loading indicator
+// Hide loading indicator
                                       });
                                     } catch (e) {
                                       print('Failed to load popular posts: $e');

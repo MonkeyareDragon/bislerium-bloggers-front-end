@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bisleriumbloggers/controllers/Blogs/blog_comment_api.dart';
 import 'package:bisleriumbloggers/controllers/Blogs/blog_details.dart';
 import 'package:bisleriumbloggers/controllers/Menu/menu_controller.dart'
@@ -5,6 +7,7 @@ import 'package:bisleriumbloggers/controllers/Menu/menu_controller.dart'
 import 'package:bisleriumbloggers/models/blog/blog.dart';
 import 'package:bisleriumbloggers/models/blog/comment.dart';
 import 'package:bisleriumbloggers/models/session/user_session.dart';
+import 'package:bisleriumbloggers/screens/Blog/update_post.dart';
 import 'package:bisleriumbloggers/utilities/helpers/app_colors.dart';
 import 'package:bisleriumbloggers/utilities/helpers/constants.dart';
 import 'package:bisleriumbloggers/utilities/helpers/responsive.dart';
@@ -15,6 +18,7 @@ import 'package:bisleriumbloggers/utilities/widgets/web_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 
 class BlogDetailsPage extends StatefulWidget {
   final String blogid;
@@ -46,6 +50,25 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<Uint8List?> _getImageData(String? imageUrl) async {
+    try {
+      // Fetch image bytes from URL
+      final response = await http.get(Uri.parse(imageUrl!));
+
+      if (response.statusCode == 200) {
+        // Convert image bytes to Uint8List
+        return response.bodyBytes;
+      } else {
+        // Image fetch failed, return null
+        return null;
+      }
+    } catch (e) {
+      // Error fetching image, return null
+      print('Error fetching image: $e');
+      return null;
+    }
   }
 
   Future<void> _fetchPostData() async {
@@ -81,6 +104,39 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
   Future<String> getCurrentUsername() async {
     final UserSession session = await getSessionOrThrow();
     return session.username;
+  }
+
+  void _showUpdateCommentPopup(String initialComment, Function(String) onSave) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Update Comment'),
+          content: TextFormField(
+            initialValue: initialComment,
+            onChanged: onSave,
+            decoration: InputDecoration(
+              hintText: 'Enter your updated comment...',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Save the updated comment
+                Navigator.of(context).pop();
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -194,6 +250,66 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
                                 ),
                               ),
                             ),
+                            FutureBuilder<String>(
+                              future: getCurrentUsername(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.done) {
+                                  final username = snapshot.data;
+                                  return Column(
+                                    children: [
+                                      if (username == _postData?.author)
+                                        Row(
+                                          children: [
+                                            // Edit Button
+                                            ElevatedButton(
+                                              onPressed: () async {
+                                                Uint8List? imageData =
+                                                    await _getImageData(
+                                                        _postData?.image);
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        UpdatePost(
+                                                      initialTitle:
+                                                          _postData?.title,
+                                                      initialContent: _postData
+                                                          ?.description,
+                                                      initialImageData:
+                                                          imageData, // Provide initial image data if available
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors
+                                                    .white10, // Change color as needed
+                                              ),
+                                              child: Text('Edit'),
+                                            ),
+                                            SizedBox(width: 10),
+                                            // Delete Button
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                // Implement delete functionality
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors
+                                                    .red, // Change color as needed
+                                              ),
+                                              child: Text('Delete'),
+                                            ),
+                                          ],
+                                        ),
+                                    ],
+                                  );
+                                } else {
+                                  return CircularProgressIndicator(); // Placeholder while fetching username
+                                }
+                              },
+                            ),
+                            SizedBox(height: 20),
                             Text(
                               _postData?.description ?? 'No Description',
                               maxLines: 4,
@@ -365,9 +481,18 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
                                               ),
                                             ],
                                           ),
-                                          Text(
-                                            comment.content ?? '',
+                                          TextButton(
+                                            onPressed: () {
+                                              _showUpdateCommentPopup(
+                                                  comment.content ?? '',
+                                                  (String updatedComment) {
+                                                // Handle saving the updated comment
+                                                // For example, you can call a function to update the comment in the database
+                                              });
+                                            },
+                                            child: Text(comment.content ?? ''),
                                           ),
+
                                           Row(
                                             children: [
                                               IconButton(

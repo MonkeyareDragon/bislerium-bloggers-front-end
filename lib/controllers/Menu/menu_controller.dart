@@ -1,5 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
+import 'package:go_router/go_router.dart';
+
+class NavigationService {
+  static void navigateToPage(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        GoRouter.of(context).push(Uri(path: '/').toString());
+        break;
+      case 1:
+        GoRouter.of(context).push(Uri(path: '/dashboard').toString());
+        break;
+      case 2:
+        GoRouter.of(context).push(Uri(path: '/notification').toString());
+        break;
+      case 3:
+        GoRouter.of(context).push(Uri(path: '/history').toString());
+        break;
+      case 4:
+        GoRouter.of(context).push(Uri(path: '/profile').toString());
+        break;
+    }
+  }
+}
 
 class MenuController extends GetxController {
   RxInt _selectedIndex = 0.obs;
@@ -7,7 +30,7 @@ class MenuController extends GetxController {
 
   int get selectedIndex => _selectedIndex.value;
   List<String> get menuItems =>
-      ["Cases", "Services", "About Us", "Careers", "Blog", "Contact"];
+      ["Blog", "Dashboard", "Notification", "History", "Profile", "About Us"];
   GlobalKey<ScaffoldState> get scaffoldkey => _scaffoldKey;
 
   void openOrCloseDrawer() {
@@ -20,5 +43,9 @@ class MenuController extends GetxController {
 
   void setMenuIndex(int index) {
     _selectedIndex.value = index;
+  }
+
+  void navigateToPage(BuildContext context, int index) {
+    NavigationService.navigateToPage(context, index);
   }
 }

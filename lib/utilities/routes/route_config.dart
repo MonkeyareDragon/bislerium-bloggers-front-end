@@ -1,3 +1,4 @@
+import 'package:bisleriumbloggers/screens/Admin/add_admin.dart';
 import 'package:bisleriumbloggers/screens/Admin/admin_page.dart';
 import 'package:bisleriumbloggers/screens/Authentication/login_page.dart';
 import 'package:bisleriumbloggers/screens/Authentication/set_username_page.dart';
@@ -5,6 +6,11 @@ import 'package:bisleriumbloggers/screens/Authentication/signup_page.dart';
 import 'package:bisleriumbloggers/screens/Blog/add_post.dart';
 import 'package:bisleriumbloggers/screens/Blog/blog_details_page.dart';
 import 'package:bisleriumbloggers/screens/Blog/blog_page.dart';
+import 'package:bisleriumbloggers/screens/Blog/edit_profile_page.dart';
+import 'package:bisleriumbloggers/screens/Blog/history.dart';
+import 'package:bisleriumbloggers/screens/Blog/notification_page.dart';
+import 'package:bisleriumbloggers/screens/Blog/password_change.dart';
+import 'package:bisleriumbloggers/screens/Blog/user.dart';
 import 'package:bisleriumbloggers/screens/test/about.dart';
 import 'package:bisleriumbloggers/screens/test/contact_us.dart';
 import 'package:bisleriumbloggers/screens/test/error_page.dart';
@@ -66,12 +72,58 @@ class AppRouter {
           },
         ),
         GoRoute(
+          name: AppRouteConstants.addAdminRouteName,
+          path: '/addAdmin',
+          pageBuilder: (context, state) {
+            return MaterialPage(child: AddAdminPage());
+          },
+        ),
+        GoRoute(
           name: AppRouteConstants.usernameRouteName,
           path: '/username',
           pageBuilder: (context, state) {
             return const MaterialPage(child: SetUsernamePage());
           },
         ),
+        GoRoute(
+          name: AppRouteConstants.notificationRouteName,
+          path: '/notification',
+          pageBuilder: (context, state) {
+            return MaterialPage(child: NotificationPage());
+          },
+        ),
+        GoRoute(
+          name: AppRouteConstants.historyRouteName,
+          path: '/history',
+          pageBuilder: (context, state) {
+            return MaterialPage(child: HistoryPage());
+          },
+        ),
+        GoRoute(
+          name: AppRouteConstants.passwordChangeRouteName,
+          path: '/password-change',
+          pageBuilder: (context, state) {
+            return MaterialPage(child: PasswordChangePage());
+          },
+        ),
+        GoRoute(
+          name: AppRouteConstants.userProfileRouteName,
+          path: '/profile',
+          pageBuilder: (context, state) {
+            return MaterialPage(child: UserProfilePage());
+          },
+        ),
+        GoRoute(
+          name: AppRouteConstants.editUserProfileRouteName,
+          path: '/profile/edit/:username/:email',
+          pageBuilder: (context, state) {
+            return MaterialPage(
+                child: EditProfilePage(
+                    initialUsername: state.params['username']!,
+                    initialEmail: state.params['email']!));
+          },
+        ),
+        //Test
         GoRoute(
           name: AppRouteConstants.profileRouteName,
           path: '/profile/:username/:userid',
