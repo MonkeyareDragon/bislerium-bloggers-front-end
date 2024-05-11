@@ -50,4 +50,13 @@ class SessionManager {
     prefs.remove(_keyusername);
     prefs.remove(_keyrole);
   }
+
+  static Future<void> updateProfileSession(
+      String email, String username) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove(_keyemail);
+    prefs.remove(_keyusername);
+    prefs.setString(_keyemail, email);
+    prefs.setString(_keyusername, username);
+  }
 }

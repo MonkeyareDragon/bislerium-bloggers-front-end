@@ -1,16 +1,18 @@
+import 'package:bisleriumbloggers/screens/Admin/access_denial%20_page.dart';
 import 'package:bisleriumbloggers/screens/Admin/add_admin.dart';
 import 'package:bisleriumbloggers/screens/Admin/admin_page.dart';
+import 'package:bisleriumbloggers/screens/Admin/successfull_admin_create.dart';
 import 'package:bisleriumbloggers/screens/Authentication/login_page.dart';
 import 'package:bisleriumbloggers/screens/Authentication/set_username_page.dart';
 import 'package:bisleriumbloggers/screens/Authentication/signup_page.dart';
 import 'package:bisleriumbloggers/screens/Blog/add_post.dart';
 import 'package:bisleriumbloggers/screens/Blog/blog_details_page.dart';
 import 'package:bisleriumbloggers/screens/Blog/blog_page.dart';
-import 'package:bisleriumbloggers/screens/Blog/edit_profile_page.dart';
+import 'package:bisleriumbloggers/screens/User/edit_profile_page.dart';
 import 'package:bisleriumbloggers/screens/Blog/history.dart';
 import 'package:bisleriumbloggers/screens/Blog/notification_page.dart';
 import 'package:bisleriumbloggers/screens/Blog/password_change.dart';
-import 'package:bisleriumbloggers/screens/Blog/user.dart';
+import 'package:bisleriumbloggers/screens/User/user_profile.dart';
 import 'package:bisleriumbloggers/screens/test/about.dart';
 import 'package:bisleriumbloggers/screens/test/contact_us.dart';
 import 'package:bisleriumbloggers/screens/test/error_page.dart';
@@ -20,7 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
-  static GoRouter returnRouter(bool isAuth, bool isAdmin) {
+  static GoRouter returnRouter(bool isAuth) {
     GoRouter router = GoRouter(
       routes: [
         GoRoute(
@@ -123,6 +125,20 @@ class AppRouter {
                     initialEmail: state.params['email']!));
           },
         ),
+        GoRoute(
+          name: AppRouteConstants.accessdenialRouteName,
+          path: '/access-denial',
+          pageBuilder: (context, state) {
+            return MaterialPage(child: AccessDenialPage());
+          },
+        ),
+        GoRoute(
+          name: AppRouteConstants.addAdminSuccessRouteName,
+          path: '/admin-create/success',
+          pageBuilder: (context, state) {
+            return MaterialPage(child: SuccessAdminCreationPage());
+          },
+        ),
         //Test
         GoRoute(
           name: AppRouteConstants.profileRouteName,
@@ -152,13 +168,6 @@ class AppRouter {
       ],
       errorPageBuilder: (context, state) {
         return MaterialPage(child: ErrorPage());
-      },
-      redirect: (context, state) {
-        if (!isAuth && state.location != '/') {
-          return context.namedLocation(AppRouteConstants.loginRouteName);
-        } else {
-          return null;
-        }
       },
     );
     return router;

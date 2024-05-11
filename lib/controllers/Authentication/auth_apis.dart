@@ -21,6 +21,7 @@ Future<Map<String, dynamic>> login(
     // Successful login
     final Map<String, dynamic> responseData = jsonDecode(response.body);
     print(responseData); // Print the response data
+    await SessionManager.clearSession();
     String userId = responseData['id'];
     String accessToken = responseData['token'];
     String email = responseData['email'];
@@ -61,5 +62,28 @@ Future<Map<String, dynamic>> register(String username, String email,
   } else {
     print('Error: ${response.statusCode} - ${response.body}');
     return {'success': false, 'error': '${response.body}'};
+  }
+}
+
+Future<bool> registerAdmin(String username, String email, String password,
+    String confirmPassword) async {
+  final response = await http.post(
+    ApiUrlHelper.buildUrl('api/Account/register'),
+    headers: <String, String>{
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode(<String, String>{
+      'email': email,
+      'password': password,
+      'confirmPassword': confirmPassword,
+      'username': username,
+      'role': "Admin",
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    return true;
+  } else {
+    return false;
   }
 }

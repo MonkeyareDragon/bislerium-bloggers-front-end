@@ -1,14 +1,40 @@
+import 'package:bisleriumbloggers/controllers/User/user_profile_apis.dart';
+import 'package:bisleriumbloggers/models/session/user_session.dart';
+import 'package:bisleriumbloggers/utilities/helpers/sesson_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class UserProfilePage extends StatelessWidget {
+class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
 
   @override
+  _UserProfilePage createState() => _UserProfilePage();
+}
+
+class _UserProfilePage extends State<UserProfilePage> {
+  UserSession? session;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSession();
+  }
+
+  Future<void> _fetchSession() async {
+    try {
+      session = await getSessionOrThrow();
+      setState(() {});
+    } catch (e) {
+      print('Error fetching session: $e');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    String username = 'kabin';
-    String email = 'kabin123@gmail.com';
-    String userType = 'Blogger';
+    String username = session?.username ?? 'Loading..';
+    String email = session?.email ?? 'Loading..';
+    String userType = session?.role ?? 'Loading..';
+
     return Theme(
       data: ThemeData.dark(), // Apply dark theme
       child: Scaffold(
@@ -103,11 +129,13 @@ class UserProfilePage extends StatelessWidget {
                                 child: Text('Cancel'),
                               ),
                               TextButton(
-                                onPressed: () {
-                                  // Implement delete functionality here
-                                  // Once deletion is complete, you can navigate back to previous screen or perform any other action
-                                  Navigator.of(context)
-                                      .pop(); // Closethe dialog
+                                onPressed: () async {
+                                  bool isSuccess = await deleteUser();
+                                  if (isSuccess) {
+                                    Navigator.of(context).pop();
+                                    GoRouter.of(context)
+                                        .push(Uri(path: '/login').toString());
+                                  }
                                 },
                                 child: Text('Delete'),
                               ),

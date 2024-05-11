@@ -1,38 +1,43 @@
 import 'dart:convert';
-import 'package:bisleriumbloggers/models/blog/blog.dart';
-import 'package:bisleriumbloggers/models/session/user_session.dart';
-import 'package:bisleriumbloggers/utilities/helpers/sesson_helper.dart';
-import 'package:http/http.dart' as http;
-import 'package:bisleriumbloggers/utilities/helpers/url_helper.dart';
 
-Future<Blog?> getPostById(String id) async {
+import 'package:bisleriumbloggers/models/session/user_session.dart';
+import 'package:bisleriumbloggers/utilities/helpers/session_manager.dart';
+import 'package:bisleriumbloggers/utilities/helpers/sesson_helper.dart';
+import 'package:bisleriumbloggers/utilities/helpers/url_helper.dart';
+import 'package:http/http.dart' as http;
+
+Future<bool> updateUserProfile(Map<String, dynamic> body) async {
   try {
     final UserSession session = await getSessionOrThrow();
-    final response = await http.get(
-      ApiUrlHelper.buildUrl('post/get-by-id?id=$id'),
+    final response = await http.put(
+      ApiUrlHelper.buildUrl('api/Account/update?id=${session.userId}'),
       headers: <String, String>{
         'Authorization': 'Bearer ${session.accessToken}',
         'Content-Type': 'application/json',
       },
+      body: jsonEncode(body),
     );
 
     if (response.statusCode == 200) {
-      // Parse the JSON response into a Blog object
-      return Blog.fromJson(json.decode(response.body));
+      String email = body["email"];
+      String username = body["username"];
+
+      await SessionManager.updateProfileSession(email, username);
+      return true;
     } else {
-      throw Exception('Failed to load post');
+      return false;
     }
   } catch (e) {
-    print('Error: $e');
-    return null;
+    print('Error updating user profile: $e');
+    throw Exception('Failed to updating user profile: $e');
   }
 }
 
-Future<bool> deleteBlogPost(String? id) async {
+Future<bool> deleteUser() async {
   try {
     final UserSession session = await getSessionOrThrow();
     final response = await http.delete(
-      ApiUrlHelper.buildUrl('post/delete/?id=$id'),
+      ApiUrlHelper.buildUrl('api/Account?id=${session.userId}'),
       headers: <String, String>{
         'Authorization': 'Bearer ${session.accessToken}',
         'Content-Type': 'application/json; charset=UTF-8',
@@ -40,6 +45,8 @@ Future<bool> deleteBlogPost(String? id) async {
     );
 
     if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, the comment was added successfully
+      await SessionManager.clearSession();
       return true;
     } else {
       return false;

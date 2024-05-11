@@ -117,3 +117,25 @@ Future<bool> deleteCommentOnPost(String? id) async {
     // Handle any errors here
   }
 }
+
+Future<bool> updateComment(Map<String, dynamic> body) async {
+  try {
+    final UserSession session = await getSessionOrThrow();
+    final response = await http.put(
+      ApiUrlHelper.buildUrl('comment/update/'),
+      headers: <String, String>{
+        'Authorization': 'Bearer ${session.accessToken}',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (e) {
+    throw Exception('Failed to updating comment: $e');
+  }
+}

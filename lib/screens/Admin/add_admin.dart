@@ -1,4 +1,8 @@
+import 'package:bisleriumbloggers/controllers/Authentication/auth_apis.dart';
+import 'package:bisleriumbloggers/screens/Authentication/login_page.dart';
+import 'package:bisleriumbloggers/utilities/helpers/sesson_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AddAdminPage extends StatefulWidget {
   @override
@@ -7,9 +11,39 @@ class AddAdminPage extends StatefulWidget {
 
 class _AddAdminPageState extends State<AddAdminPage> {
   final _formKey = GlobalKey<FormState>();
-  String _user = '';
-  String _email = '';
-  String _password = '';
+  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> fetchData() async {
+    try {
+      final session = await getSessionOrThrow();
+      if (session.role != 'Admin') {
+        GoRouter.of(context).push(Uri(path: '/access-denial').toString());
+      } else {}
+    } catch (e) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginPage(),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +68,7 @@ class _AddAdminPageState extends State<AddAdminPage> {
               ),
               SizedBox(height: 8.0),
               TextFormField(
+                controller: usernameController,
                 decoration: InputDecoration(
                   hintText: 'Enter user name',
                   border: OutlineInputBorder(),
@@ -44,7 +79,6 @@ class _AddAdminPageState extends State<AddAdminPage> {
                   }
                   return null;
                 },
-                onSaved: (value) => _user = value!,
               ),
               SizedBox(height: 16.0),
               Text(
@@ -56,6 +90,7 @@ class _AddAdminPageState extends State<AddAdminPage> {
               ),
               SizedBox(height: 8.0),
               TextFormField(
+                controller: emailController,
                 decoration: InputDecoration(
                   hintText: 'Enter email address',
                   border: OutlineInputBorder(),
@@ -64,14 +99,12 @@ class _AddAdminPageState extends State<AddAdminPage> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter an email address';
                   }
-                  // Add email validation logic here...
                   return null;
                 },
-                onSaved: (value) => _email = value!,
               ),
               SizedBox(height: 16.0),
               Text(
-              'Password',
+                'Password',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18.0,
@@ -79,6 +112,7 @@ class _AddAdminPageState extends State<AddAdminPage> {
               ),
               SizedBox(height: 8.0),
               TextFormField(
+                controller: passwordController,
                 decoration: InputDecoration(
                   hintText: 'Enter password',
                   border: OutlineInputBorder(),
@@ -88,18 +122,25 @@ class _AddAdminPageState extends State<AddAdminPage> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a password';
                   }
-                  // Add password validation logic here...
                   return null;
                 },
-                onSaved: (value) => _password = value!,
               ),
               SizedBox(height: 32.0),
               Center(
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
-                      // TODO: Implement add admin logic here
+                      final String email = emailController.text.trim();
+                      final String password = passwordController.text.trim();
+                      final String username = usernameController.text.trim();
+
+                      bool isStatus = await registerAdmin(
+                          username, email, password, password);
+                      if (isStatus) {
+                        GoRouter.of(context).push(
+                            Uri(path: '/admin-create/success').toString());
+                      } else {}
                     }
                   },
                   child: Text('Create'),

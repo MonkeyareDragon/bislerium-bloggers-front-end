@@ -23,3 +23,29 @@ class PostSummaryDTO {
     );
   }
 }
+
+class UserPopularityDto {
+  final String userId;
+  final String username;
+  final DateTime createdAt;
+  final double popularityScore;
+  final int totalPosts;
+
+  UserPopularityDto({
+    required this.userId,
+    required this.username,
+    required this.createdAt,
+    required this.popularityScore,
+    required this.totalPosts,
+  });
+
+  factory UserPopularityDto.fromJson(Map<String, dynamic> json) {
+    return UserPopularityDto(
+      userId: json['userId'],
+      username: json['username'],
+      createdAt: DateTime.parse(json['createdAt']),
+      popularityScore: json['popularityScore'],
+      totalPosts: json['totalPosts'],
+    );
+  }
+}

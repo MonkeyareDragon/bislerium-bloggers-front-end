@@ -1,6 +1,7 @@
 import 'package:bisleriumbloggers/controllers/Dashboard/dashboard_apis.dart';
 import 'package:bisleriumbloggers/models/dashboard/dashboard_count.dart';
 import 'package:bisleriumbloggers/models/dashboard/dashboard_post.dart';
+import 'package:bisleriumbloggers/utilities/helpers/sesson_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,19 +15,37 @@ class _AdminPage extends State<AdminPage> {
   bool isExpanded = false;
   String _selectedCountFilter = "All Time";
   String _selectedPostFilter = "All Time";
+  String _selectedBloggerFilter = "All Time";
   bool _showDateRangeFields = false;
   bool _showMonthPostRangeFields = false;
+  bool _showMonthBloggerRangeFields = false;
   DateTime? _startDate;
   DateTime? _endDate;
   DashboardCounts? countData;
   int? _selectedPostMonth;
+  int? _selectedBloggerMonth;
   late List<PostSummaryDTO> _popularPosts = [];
+  late List<UserPopularityDto> _popularBloggers = [];
 
   @override
   void initState() {
     super.initState();
-    fetchCountAllTimeData();
-    fetchPopularPostsAllTimeScreen();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    try {
+      final session = await getSessionOrThrow();
+      if (session.role != 'Admin') {
+        GoRouter.of(context).push(Uri(path: '/access-denial').toString());
+      } else {
+        await fetchCountAllTimeData();
+        await fetchPopularPostsAllTimeScreen();
+        await fetchPopularBloggersAllTimeScreen();
+      }
+    } catch (e) {
+      GoRouter.of(context).replace(Uri(path: '/login').toString());
+    }
   }
 
   Future<void> fetchCountAllTimeData() async {
@@ -69,6 +88,16 @@ class _AdminPage extends State<AdminPage> {
   Future<void> fetchPopularPostsAllTimeScreen() async {
     try {
       _popularPosts = await fetchPopularPostsAllTime();
+      setState(() {});
+    } catch (e) {
+      print('Failed to load popular posts: $e');
+      // Handle error
+    }
+  }
+
+  Future<void> fetchPopularBloggersAllTimeScreen() async {
+    try {
+      _popularBloggers = await fetchPopularBloggerAllTime();
       setState(() {});
     } catch (e) {
       print('Failed to load popular posts: $e');
@@ -559,15 +588,11 @@ class _AdminPage extends State<AdminPage> {
                                 onPressed: () async {
                                   if (_selectedPostMonth != null) {
                                     try {
-                                      setState(() {
-// Show loading indicator
-                                      });
+                                      setState(() {});
                                       _popularPosts =
                                           await getPopularPostsChosenMonth(
                                               _selectedPostMonth!);
-                                      setState(() {
-// Hide loading indicator
-                                      });
+                                      setState(() {});
                                     } catch (e) {
                                       print('Failed to load popular posts: $e');
                                       // Handle error
@@ -611,6 +636,10 @@ class _AdminPage extends State<AdminPage> {
                         ),
                       ],
                     ),
+                    //Now let's set the article section
+                    const SizedBox(
+                      height: 30.0,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -627,7 +656,7 @@ class _AdminPage extends State<AdminPage> {
                               height: 10.0,
                             ),
                             Text(
-                              "2 new Blogger",
+                              "2 new Articles",
                               style: TextStyle(
                                   color: Colors.grey,
                                   fontSize: 18.0,
@@ -640,71 +669,106 @@ class _AdminPage extends State<AdminPage> {
                     SizedBox(
                       height: 40.0,
                     ),
-
-                    //let's set the filter section
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
                             DropdownButton(
-                                hint: Text("Filter by"),
-                                items: [
-                                  DropdownMenuItem(
-                                    value: "All Time",
-                                    child: Text("All Time"),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: "Monthly",
-                                    child: Text("Monthly"),
-                                  ),
-                                ],
-                                onChanged: (value) {}),
-                            SizedBox(
-                              width: 20.0,
+                              hint: const Text("Filter by"),
+                              value: _selectedBloggerFilter,
+                              items: const [
+                                DropdownMenuItem(
+                                  value: "All Time",
+                                  child: Text("All Time"),
+                                ),
+                                DropdownMenuItem(
+                                  value: "Monthly",
+                                  child: Text("Monthly"),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedBloggerFilter = value.toString();
+                                  if (_selectedBloggerFilter == "Monthly") {
+                                    _showMonthBloggerRangeFields = true;
+                                  } else {
+                                    _showMonthBloggerRangeFields = false;
+                                  }
+                                });
+                              },
                             ),
                           ],
                         ),
+                        if (_showMonthBloggerRangeFields)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              DropdownButton<int>(
+                                hint: const Text('Choose a month'),
+                                value: _selectedBloggerMonth,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    _selectedBloggerMonth = newValue;
+                                  });
+                                },
+                                items: [
+                                  for (int j = 1; j <= 12; j++)
+                                    DropdownMenuItem(
+                                      value: j,
+                                      child: Text(_getMonthName(j)),
+                                    ),
+                                ],
+                              ),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  if (_selectedBloggerMonth != null) {
+                                    try {
+                                      setState(() {});
+                                      _popularBloggers =
+                                          await getPopularBloggersChosenMonth(
+                                              _selectedBloggerMonth!);
+                                      setState(() {});
+                                    } catch (e) {
+                                      print(
+                                          'Failed to load popular blogger: $e');
+                                      // Handle error
+                                    }
+                                  }
+                                },
+                                child: const Text("Filter"),
+                              ),
+                            ],
+                          ),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 40.0,
                     ),
-                    //Now let's add the Table
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         DataTable(
                           headingRowColor: MaterialStateProperty.resolveWith(
                               (states) => Colors.grey.shade200),
-                          columns: [
+                          columns: const [
                             DataColumn(label: Text("ID")),
                             DataColumn(label: Text("Username")),
                             DataColumn(label: Text("Creation Date")),
                             DataColumn(label: Text("Popularity")),
                             DataColumn(label: Text("Total Post")),
                           ],
-                          rows: [
-                            DataRow(cells: [
-                              DataCell(
-                                  Text("4e941b16-f47b-4e88-9e98-55db0918bc34")),
-                              DataCell(Text("Tester")),
-                              DataCell(Text("${DateTime.now()}")),
-                              DataCell(Text("2")),
-                              DataCell(Text("2")),
-                            ]),
-                            DataRow(cells: [
-                              DataCell(
-                                  Text("1501f9b0-4050-4780-bda7-318290465432")),
-                              DataCell(Text("TestUser")),
-                              DataCell(Text("${DateTime.now()}")),
-                              DataCell(Text("0")),
-                              DataCell(Text("0")),
-                            ]),
-                          ],
+                          rows: _popularBloggers.map((post) {
+                            return DataRow(cells: [
+                              DataCell(Text(post.userId.toString())),
+                              DataCell(Text(post.username)),
+                              DataCell(Text(post.createdAt.toString())),
+                              DataCell(Text("${post.popularityScore}")),
+                              DataCell(Text("${post.totalPosts}")),
+                            ]);
+                          }).toList(),
                         ),
-                        //Now let's set the pagination
-                        SizedBox(
+                        const SizedBox(
                           height: 40.0,
                         ),
                       ],

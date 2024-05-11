@@ -23,7 +23,6 @@ Future<DashboardCounts> fetchCountDashboard() async {
       throw Exception('Failed to load blogs');
     }
   } catch (e) {
-    print('Error fetching blogs: $e');
     throw Exception('Failed to fetch blogs: $e');
   }
 }
@@ -47,7 +46,6 @@ Future<DashboardCounts> fetchCountOnChosenDateDashboard(
       throw Exception('Failed to load blogs');
     }
   } catch (e) {
-    print('Error fetching blogs: $e');
     throw Exception('Failed to fetch blogs: $e');
   }
 }
@@ -70,7 +68,6 @@ Future<List<PostSummaryDTO>> fetchPopularPostsAllTime() async {
       throw Exception('Failed to load popular posts');
     }
   } catch (e) {
-    print('Failed to load popular posts: $e');
     throw Exception('Failed to load popular posts: $e');
   }
 }
@@ -97,5 +94,50 @@ Future<List<PostSummaryDTO>> getPopularPostsChosenMonth(int month) async {
     }
   } catch (e) {
     throw Exception('Failed to load data: $e');
+  }
+}
+
+Future<List<UserPopularityDto>> fetchPopularBloggerAllTime() async {
+  try {
+    final UserSession session = await getSessionOrThrow();
+    final response = await http.get(
+      ApiUrlHelper.buildUrl('dashboard/popular-bloggers-all-time'),
+      headers: <String, String>{
+        'Authorization': 'Bearer ${session.accessToken}',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => UserPopularityDto.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load popular blogger');
+    }
+  } catch (e) {
+    throw Exception('Failed to load popular blogger: $e');
+  }
+}
+
+Future<List<UserPopularityDto>> getPopularBloggersChosenMonth(int month) async {
+  try {
+    final UserSession session = await getSessionOrThrow();
+    final response = await http.get(
+      ApiUrlHelper.buildUrl(
+          'dashboard/popular-bloggers-chosen-month/?month=$month'),
+      headers: <String, String>{
+        'Authorization': 'Bearer ${session.accessToken}',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => UserPopularityDto.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load popular blogger monthly');
+    }
+  } catch (e) {
+    throw Exception('Failed to load popular blogger monthly: $e');
   }
 }

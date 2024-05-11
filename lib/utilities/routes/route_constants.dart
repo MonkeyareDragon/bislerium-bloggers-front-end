@@ -12,6 +12,8 @@ class AppRouteConstants {
   static const String historyRouteName = 'history';
   static const String passwordChangeRouteName = 'passwordChange';
   static const String userProfileRouteName = 'userProfile';
+  static const String accessdenialRouteName = 'accessDenial';
+  static const String addAdminSuccessRouteName = 'addAdminSuccess';
   static const String editUserProfileRouteName = 'editUserProfile';
   static const String aboutRouteName = 'about';
   static const String profileRouteName = 'profile';

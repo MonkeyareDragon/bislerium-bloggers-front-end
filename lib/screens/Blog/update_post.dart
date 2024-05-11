@@ -8,12 +8,14 @@ import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 
 class UpdatePost extends StatefulWidget {
+  final String? blogid;
   final String? initialTitle;
   final String? initialContent;
   final Uint8List? initialImageData;
 
   const UpdatePost({
     Key? key,
+    this.blogid,
     this.initialTitle,
     this.initialContent,
     this.initialImageData,
@@ -31,7 +33,6 @@ class _UpdatePostState extends State<UpdatePost> {
   @override
   void initState() {
     super.initState();
-    // Populate fields with initial data
     _titleController.text = widget.initialTitle ?? '';
     _contentController.text = widget.initialContent ?? '';
     _imageData = widget.initialImageData;
@@ -66,7 +67,7 @@ class _UpdatePostState extends State<UpdatePost> {
     }
   }
 
-  Future<void> _updateBlog() async {
+  Future<void> _updateBlog(String? blogid) async {
     String title = _titleController.text;
     String content = _contentController.text;
 
@@ -111,8 +112,8 @@ class _UpdatePostState extends State<UpdatePost> {
       final session = await getSessionOrThrow();
 
       // Construct form-data
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('https://127.0.0.1:5181/post/update/'))
+      var request = http.MultipartRequest('PUT',
+          Uri.parse('https://127.0.0.1:5181/post/update/?postId=$blogid'))
         ..headers['Authorization'] = 'Bearer ${session.accessToken}'
         ..fields['title'] = title
         ..fields['content'] = content
@@ -142,7 +143,8 @@ class _UpdatePostState extends State<UpdatePost> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  GoRouter.of(context).push(Uri(path: '/').toString());
+                  GoRouter.of(context)
+                      .push(Uri(path: '/details/$blogid').toString());
                 },
                 child: Text('OK'),
               ),
@@ -230,7 +232,7 @@ class _UpdatePostState extends State<UpdatePost> {
             ),
             SizedBox(height: 20.0),
             ElevatedButton(
-              onPressed: _updateBlog, // Call the function to update the blog
+              onPressed: () => _updateBlog(widget.blogid),
               child: Text('Update'),
             ),
           ],

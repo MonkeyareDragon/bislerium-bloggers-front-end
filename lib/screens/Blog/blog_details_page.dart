@@ -18,6 +18,7 @@ import 'package:bisleriumbloggers/utilities/widgets/web_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 
 class BlogDetailsPage extends StatefulWidget {
@@ -106,18 +107,37 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
     return session.username;
   }
 
-  void _showUpdateCommentPopup(String initialComment, Function(String) onSave) {
+  void _showSnackBarOnPreviousScreen(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: BisleriumColor.kPrimaryColor,
+        elevation: 0,
+        margin: EdgeInsets.only(
+          top: 0,
+        ),
+      ),
+    );
+  }
+
+  void _showUpdateCommentPopup(
+      String commentId, String initialComment, Function(String) onSave) {
+    late TextEditingController updateCommentController;
+    updateCommentController = TextEditingController(text: initialComment);
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Update Comment'),
           content: TextFormField(
-            initialValue: initialComment,
             onChanged: onSave,
             decoration: InputDecoration(
               hintText: 'Enter your updated comment...',
             ),
+            controller: updateCommentController,
           ),
           actions: <Widget>[
             TextButton(
@@ -127,8 +147,22 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
               child: Text('Cancel'),
             ),
             ElevatedButton(
-              onPressed: () {
-                // Save the updated comment
+              onPressed: () async {
+                final body = {
+                  "commentId": commentId,
+                  "commentText": updateCommentController.text
+                };
+                print(body);
+                bool isSuccess = await updateComment(body);
+
+                if (isSuccess) {
+                  _showSnackBarOnPreviousScreen(
+                      context, 'Comment updated successfully');
+                  _fetchPostData();
+                } else {
+                  _showSnackBarOnPreviousScreen(
+                      context, 'Comment to update the profile');
+                }
                 Navigator.of(context).pop();
               },
               child: Text('Save'),
@@ -272,6 +306,7 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
                                                   MaterialPageRoute(
                                                     builder: (context) =>
                                                         UpdatePost(
+                                                      blogid: _postData?.id,
                                                       initialTitle:
                                                           _postData?.title,
                                                       initialContent: _postData
@@ -292,7 +327,48 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
                                             // Delete Button
                                             ElevatedButton(
                                               onPressed: () {
-                                                // Implement delete functionality
+                                                showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return AlertDialog(
+                                                      title:
+                                                          Text('Confirmation'),
+                                                      content: Text(
+                                                          'Are you sure you want to delete your post?'),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop(); // Close the dialog
+                                                          },
+                                                          child: Text('Cancel'),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () async {
+                                                            bool isSuccess =
+                                                                await deleteBlogPost(
+                                                                    _postData
+                                                                        ?.id);
+                                                            if (isSuccess) {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                              GoRouter.of(
+                                                                      context)
+                                                                  .push(Uri(
+                                                                          path:
+                                                                              '/')
+                                                                      .toString());
+                                                            }
+                                                          },
+                                                          child: Text('Delete'),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  },
+                                                );
                                               },
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: Colors
@@ -484,6 +560,7 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
                                           TextButton(
                                             onPressed: () {
                                               _showUpdateCommentPopup(
+                                                  comment.commentid ?? '',
                                                   comment.content ?? '',
                                                   (String updatedComment) {
                                                 // Handle saving the updated comment
