@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:bisleriumbloggers/controllers/others/history_apis.dart';
 import 'package:bisleriumbloggers/utilities/helpers/sesson_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -133,24 +134,27 @@ class _UpdatePostState extends State<UpdatePost> {
       var response = await http.Response.fromStream(await request.send());
 
       if (response.statusCode == 200) {
-        // Blog updated successfully
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Success'),
-            content: Text('Blog updated successfully.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  GoRouter.of(context)
-                      .push(Uri(path: '/details/$blogid').toString());
-                },
-                child: Text('OK'),
-              ),
-            ],
-          ),
-        );
+        bool success =
+            await addHistory(blogid, null, title, widget.initialTitle);
+        if (success)
+          // Blog updated successfully
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Success'),
+              content: Text('Blog updated successfully.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    GoRouter.of(context)
+                        .push(Uri(path: '/details/$blogid').toString());
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            ),
+          );
       } else {
         // Failed to update blog
         showDialog(

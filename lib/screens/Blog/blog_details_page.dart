@@ -4,6 +4,7 @@ import 'package:bisleriumbloggers/controllers/Blogs/blog_comment_api.dart';
 import 'package:bisleriumbloggers/controllers/Blogs/blog_details.dart';
 import 'package:bisleriumbloggers/controllers/Menu/menu_controller.dart'
     as news_menu_controller;
+import 'package:bisleriumbloggers/controllers/others/history_apis.dart';
 import 'package:bisleriumbloggers/models/blog/blog.dart';
 import 'package:bisleriumbloggers/models/blog/comment.dart';
 import 'package:bisleriumbloggers/models/session/user_session.dart';
@@ -156,8 +157,11 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
                 bool isSuccess = await updateComment(body);
 
                 if (isSuccess) {
-                  _showSnackBarOnPreviousScreen(
-                      context, 'Comment updated successfully');
+                  bool success = await addHistory(null, commentId,
+                      initialComment, updateCommentController.text);
+                  if (success)
+                    _showSnackBarOnPreviousScreen(
+                        context, 'Comment updated successfully');
                   _fetchPostData();
                 } else {
                   _showSnackBarOnPreviousScreen(

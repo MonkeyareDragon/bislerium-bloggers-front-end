@@ -1,26 +1,66 @@
+import 'dart:convert';
+import 'package:bisleriumbloggers/controllers/others/history_apis.dart';
+import 'package:intl/intl.dart';
+import 'package:bisleriumbloggers/models/session/user_session.dart';
+import 'package:bisleriumbloggers/utilities/helpers/sesson_helper.dart';
+import 'package:bisleriumbloggers/utilities/helpers/url_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-class HistoryPage extends StatelessWidget {
-  final List<Map<String, String>> _historyItems = [
-    {
-      'date': 'May 9, 2024',
-      'original': 'This is original',
-      'update': 'Fixed a bug in the login page',
-      'tags': '#blog',
-    },
-    {
-      'date': 'May 9, 2024',
-      'original': 'This is Test Comment',
-      'update': 'Update test comment',
-      'tags': '#comment',
-    },
-    {
-      'date': 'May 9, 2024',
-      'original': 'This is original',
-      'update': 'Very helpfull comment.',
-      'tags': '#comment',
+class HistoryPage extends StatefulWidget {
+  @override
+  _HistoryPageState createState() => _HistoryPageState();
+}
+
+class _HistoryPageState extends State<HistoryPage> {
+  List<Map<String, String>> _historyItems = [];
+
+  Future<void> fetchHistoryData() async {
+    final UserSession session = await getSessionOrThrow();
+    final response = await http
+        .get(ApiUrlHelper.buildUrl('history/get/'), headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${session.accessToken}',
+    });
+    if (response.statusCode == 200) {
+      final List<dynamic> historyData = jsonDecode(response.body);
+      setState(() {
+        _historyItems = historyData.map<Map<String, String>>((data) {
+          final postId = data['postId'];
+          final commentId = data['commentId'];
+          final tagName = postId != null
+              ? 'Post'
+              : commentId != null
+                  ? 'Comment'
+                  : '';
+          final formattedDate = DateFormat('MMM d, yyyy hh a')
+              .format(DateTime.parse(data['createdAt']));
+          return {
+            'id': data["historyID"],
+            'date': formattedDate,
+            'original': data['previousContent'],
+            'update': data['updatedContent'],
+            'tags': '#' + tagName,
+          };
+        }).toList();
+      });
+    } else {
+      throw Exception('Failed to load history data');
     }
-  ];
+  }
+
+  Future<void> deleteBlogComment(String? commentid) async {
+    bool result = await deleteHistory(commentid);
+    if (result) {
+      fetchHistoryData();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchHistoryData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,46 +118,49 @@ class HistoryPage extends StatelessWidget {
                         ],
                       ),
                       SizedBox(height: 8.0),
+                      Row(
+                        children: [
+                          Text("Update Content: "),
+                          SizedBox(width: 5.0),
+                          Text(
+                            item['update']!,
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8.0),
                       Wrap(
                         spacing: 8.0,
                         runSpacing: -4.0,
-                        children: item['tags']!.split(',').map((tag) {
-                          return Chip(
-                            label: Text(
-                              tag.trim(),
-                              style: TextStyle(
-                                fontSize: 12.0,
-                                color: Colors.grey[800],
+                        children: [
+                          ...item['tags']!.split(',').map((tag) {
+                            return Chip(
+                              label: Text(
+                                tag.trim(),
+                                style: TextStyle(
+                                  fontSize: 12.0,
+                                  color: Colors.grey[800],
+                                ),
                               ),
-                            ),
-                            backgroundColor: Colors.grey[200],
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16.0),
-                            ),
-                          );
-                        }).toList(),
+                              backgroundColor: Colors.grey[200],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16.0),
+                              ),
+                            );
+                          }).toList(),
+                          IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () {
+                              print(item['id']!);
+                              deleteBlogComment(item['id']!);
+                            },
+                          ),
+                        ],
                       ),
                     ],
-                  ),
-                ),
-                Row(
-                  children: [
-                    Text("Update Content:"),
-                  ],
-                ),
-                SizedBox(width: 8.0),
-                Expanded(
-                  flex: 2,
-                  child: InkWell(
-                    onTap: () {},
-                    child: Text(
-                      item['update']!,
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        decoration: TextDecoration.underline,
-                        color: Colors.blue,
-                      ),
-                    ),
                   ),
                 ),
               ],
