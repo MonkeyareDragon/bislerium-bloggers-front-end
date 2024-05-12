@@ -17,7 +17,19 @@ class _UserProfilePage extends State<UserProfilePage> {
   @override
   void initState() {
     super.initState();
+    loginAuthentication();
     _fetchSession();
+  }
+
+  Future<void> loginAuthentication() async {
+    try {
+      final session = await getSessionOrThrow();
+      if (session.accessToken.isEmpty) {
+        GoRouter.of(context).push(Uri(path: '/login').toString());
+      }
+    } catch (e) {
+      GoRouter.of(context).push(Uri(path: '/login').toString());
+    }
   }
 
   Future<void> _fetchSession() async {

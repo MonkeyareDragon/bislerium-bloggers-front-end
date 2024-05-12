@@ -1,23 +1,53 @@
+import 'package:bisleriumbloggers/controllers/others/notification_apis.dart';
+import 'package:bisleriumbloggers/models/others/notification.dart';
+import 'package:bisleriumbloggers/utilities/helpers/sesson_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
-class NotificationPage extends StatelessWidget {
-  final List<Map<String, dynamic>> _notifications = [
-    {
-      'image':
-          'https://ideausher.com/wp-content/uploads/2023/11/Augmented-reality-in-the-retail-industry-use-cases-and-real-life-examples-1.webp',
-      'date': 'Today, 8:28 PM',
-      'note': 'TestUser have comment on your blog!',
-    },
-    {
-      'image':
-          'https://ideausher.com/wp-content/uploads/2023/11/Augmented-reality-in-the-retail-industry-use-cases-and-real-life-examples-1.webp',
-      'date': 'Today, 8:20 PM',
-      'note': 'TestUser have like on your blog!',
-    },
-    // Add more notifications here...
-  ];
+class NotificationPage extends StatefulWidget {
+  NotificationPage({Key? key}) : super(key: key);
 
-  NotificationPage({Key? key});
+  @override
+  _NotificationPageState createState() => _NotificationPageState();
+}
+
+class _NotificationPageState extends State<NotificationPage> {
+  List<UserNotification> _notifications = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loginAuthentication();
+    _loadNotifications();
+  }
+
+  Future<void> loginAuthentication() async {
+    try {
+      final session = await getSessionOrThrow();
+      if (session.accessToken.isEmpty) {
+        GoRouter.of(context).push(Uri(path: '/login').toString());
+      }
+    } catch (e) {
+      GoRouter.of(context).push(Uri(path: '/login').toString());
+    }
+  }
+
+  Future<void> _loadNotifications() async {
+    try {
+      List<UserNotification> notifications = await getNotifications();
+      setState(() {
+        _notifications = notifications;
+      });
+    } catch (e) {}
+  }
+
+  Future<void> deleteUserNotification(String? commentid) async {
+    bool result = await deleteNotification(commentid);
+    if (result) {
+      _loadNotifications();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +66,7 @@ class NotificationPage extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(50.0),
                   child: Image.network(
-                    notification['image']!,
+                    notification.postImage!,
                     width: 100.0,
                     height: 100.0,
                     fit: BoxFit.cover,
@@ -47,7 +77,8 @@ class NotificationPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      notification['date']!,
+                      DateFormat('MMM d, yyyy hh a')
+                          .format(DateTime.parse(notification.createdAt!)),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16.0,
@@ -55,10 +86,16 @@ class NotificationPage extends StatelessWidget {
                     ),
                     SizedBox(height: 8.0),
                     Text(
-                      notification['note']!,
+                      notification.note!,
                       style: TextStyle(
                         fontSize: 16.0,
                       ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        deleteUserNotification(notification.notificationId);
+                      },
                     ),
                   ],
                 ),

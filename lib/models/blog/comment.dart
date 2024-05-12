@@ -1,11 +1,11 @@
 class Comment {
-  final String? commentid;
-  final String? author;
-  final String? content;
-  final int? voteCount;
+  String? commentid;
+  String? author;
+  String? content;
+  int? voteCount;
   final String? createDate;
   final String? updateDate;
-  final int? replyCount;
+  int? replyCount;
   List<Reply>? replies;
   bool showReplies;
 

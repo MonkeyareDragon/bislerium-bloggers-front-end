@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:bisleriumbloggers/controllers/others/history_apis.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:bisleriumbloggers/models/session/user_session.dart';
 import 'package:bisleriumbloggers/utilities/helpers/sesson_helper.dart';
@@ -49,7 +50,7 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
-  Future<void> deleteBlogComment(String? commentid) async {
+  Future<void> deleteUserHistory(String? commentid) async {
     bool result = await deleteHistory(commentid);
     if (result) {
       fetchHistoryData();
@@ -59,7 +60,19 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   void initState() {
     super.initState();
+    loginAuthentication();
     fetchHistoryData();
+  }
+
+  Future<void> loginAuthentication() async {
+    try {
+      final session = await getSessionOrThrow();
+      if (session.accessToken.isEmpty) {
+        GoRouter.of(context).push(Uri(path: '/login').toString());
+      }
+    } catch (e) {
+      GoRouter.of(context).push(Uri(path: '/login').toString());
+    }
   }
 
   @override
@@ -154,8 +167,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           IconButton(
                             icon: Icon(Icons.delete),
                             onPressed: () {
-                              print(item['id']!);
-                              deleteBlogComment(item['id']!);
+                              deleteUserHistory(item['id']!);
                             },
                           ),
                         ],

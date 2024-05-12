@@ -4,7 +4,10 @@ import 'package:bisleriumbloggers/controllers/Blogs/blog_comment_api.dart';
 import 'package:bisleriumbloggers/controllers/Blogs/blog_details.dart';
 import 'package:bisleriumbloggers/controllers/Menu/menu_controller.dart'
     as news_menu_controller;
+import 'package:bisleriumbloggers/controllers/Reply/reply_apis.dart';
+import 'package:bisleriumbloggers/controllers/Vote/vote_apis.dart';
 import 'package:bisleriumbloggers/controllers/others/history_apis.dart';
+import 'package:bisleriumbloggers/controllers/others/notification_apis.dart';
 import 'package:bisleriumbloggers/models/blog/blog.dart';
 import 'package:bisleriumbloggers/models/blog/comment.dart';
 import 'package:bisleriumbloggers/models/session/user_session.dart';
@@ -38,15 +41,30 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
       Get.put(news_menu_controller.MenuController());
   bool liked = false;
   bool disliked = false;
+  Map<String, bool> commentLikes = {};
+  Map<String, bool> commentDislikes = {};
   Blog? _postData;
   List<Comment> comments = [];
   final TextEditingController _commentContentController =
       TextEditingController();
+  final TextEditingController _replyController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    loginAuthentication();
     _fetchPostData();
+  }
+
+  Future<void> loginAuthentication() async {
+    try {
+      final session = await getSessionOrThrow();
+      if (session.accessToken.isEmpty) {
+        GoRouter.of(context).push(Uri(path: '/login').toString());
+      }
+    } catch (e) {
+      GoRouter.of(context).push(Uri(path: '/login').toString());
+    }
   }
 
   @override
@@ -73,6 +91,14 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
     }
   }
 
+  Future<void> setNotification(String? postId) async {
+    final UserSession session = await getSessionOrThrow();
+    if (session.username != _postData?.author) {
+      String notificationNote = "${session.username} have like your blog.";
+      await addNotification(postId, notificationNote);
+    }
+  }
+
   Future<void> _fetchPostData() async {
     final blogId = widget.blogid;
     final postData = await getPostById(blogId);
@@ -89,9 +115,16 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
     }
   }
 
-  Future<void> postBlogComment(String postId, String commentText) async {
+  Future<void> postBlogComment(
+      String? BlogAuthor, String postId, String commentText) async {
+    final UserSession session = await getSessionOrThrow();
     bool result = await addCommentOnPost(postId, commentText);
     if (result) {
+      if (session.username != BlogAuthor) {
+        String notificationNote =
+            "${session.username} have Comment on your blog: $commentText";
+        await addNotification(postId, notificationNote);
+      }
       _fetchPostData();
     }
   }
@@ -410,10 +443,18 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
                                             _postData?.voteCount =
                                                 (_postData?.voteCount ?? 0) + 1;
                                             disliked = false;
+                                            updateVoteType(
+                                                _postData?.id, null, null, 1);
+                                          } else {
+                                            createVote(
+                                                _postData?.id, null, null, 1);
+
+                                            setNotification(_postData?.id);
                                           }
                                         } else {
                                           _postData?.voteCount =
                                               (_postData?.voteCount ?? 0) - 1;
+                                          removeVote(_postData?.id, null, null);
                                         }
                                       });
                                     },
@@ -433,10 +474,16 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
                                             _postData?.voteCount =
                                                 (_postData?.voteCount ?? 0) - 1;
                                             liked = false;
+                                            updateVoteType(
+                                                _postData?.id, null, null, 1);
+                                          } else {
+                                            createVote(
+                                                _postData?.id, null, null, 1);
                                           }
                                         } else {
                                           _postData?.voteCount =
                                               (_postData?.voteCount ?? 0) + 1;
+                                          removeVote(_postData?.id, null, null);
                                         }
                                       });
                                     },
@@ -492,7 +539,7 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
                                           String commentContext =
                                               _commentContentController.text;
 
-                                          postBlogComment(
+                                          postBlogComment(_postData?.author,
                                               blogId, commentContext);
                                           _commentContentController.clear();
                                         },
@@ -538,6 +585,16 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
                                   // Iterate over demoComments and display them
                                   Column(
                                     children: comments.map((comment) {
+                                      if (!commentLikes
+                                          .containsKey(comment.commentid)) {
+                                        commentLikes[comment.commentid ?? ""] =
+                                            false;
+                                      }
+                                      if (!commentDislikes
+                                          .containsKey(comment.commentid)) {
+                                        commentDislikes[
+                                            comment.commentid ?? ""] = false;
+                                      }
                                       return Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -561,35 +618,150 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
                                               ),
                                             ],
                                           ),
-                                          TextButton(
-                                            onPressed: () {
-                                              _showUpdateCommentPopup(
-                                                  comment.commentid ?? '',
-                                                  comment.content ?? '',
-                                                  (String updatedComment) {
-                                                // Handle saving the updated comment
-                                                // For example, you can call a function to update the comment in the database
-                                              });
+                                          FutureBuilder<String>(
+                                            future: getCurrentUsername(),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.done) {
+                                                final username = snapshot.data;
+                                                if (username ==
+                                                    comment.author) {
+                                                  return TextButton(
+                                                    onPressed: () {
+                                                      _showUpdateCommentPopup(
+                                                        comment.commentid ?? '',
+                                                        comment.content ?? '',
+                                                        (String
+                                                            updatedComment) {},
+                                                      );
+                                                    },
+                                                    child: Text(
+                                                        comment.content ?? ''),
+                                                  );
+                                                } else {
+                                                  return Text(comment.content ??
+                                                      ''); // Display text only if the condition is not met
+                                                }
+                                              } else {
+                                                return const CircularProgressIndicator();
+                                              }
                                             },
-                                            child: Text(comment.content ?? ''),
                                           ),
 
                                           Row(
                                             children: [
                                               IconButton(
                                                 onPressed: () {
-                                                  // Handle upvote button press
+                                                  setState(() {
+                                                    if (commentLikes[
+                                                        comment.commentid]!) {
+                                                      comment.voteCount =
+                                                          (comment.voteCount ??
+                                                                  0) -
+                                                              1;
+                                                      commentLikes[
+                                                          comment.commentid ??
+                                                              ""] = false;
+                                                      removeVote(
+                                                          null,
+                                                          comment.commentid,
+                                                          null);
+                                                    } else {
+                                                      comment.voteCount =
+                                                          (comment.voteCount ??
+                                                                  0) +
+                                                              1;
+                                                      commentLikes[
+                                                          comment.commentid ??
+                                                              ""] = true;
+                                                      createVote(
+                                                          null,
+                                                          comment.commentid,
+                                                          null,
+                                                          1);
+                                                      if (commentDislikes[
+                                                          comment.commentid]!) {
+                                                        comment.voteCount =
+                                                            (comment.voteCount ??
+                                                                    0) +
+                                                                1;
+                                                        commentDislikes[
+                                                            comment.commentid ??
+                                                                ""] = false;
+                                                        updateVoteType(
+                                                            null,
+                                                            comment.commentid,
+                                                            null,
+                                                            1);
+                                                      }
+                                                    }
+                                                  });
                                                 },
                                                 icon:
                                                     Icon(Icons.thumb_up_sharp),
+                                                color: commentLikes[
+                                                        comment.commentid]!
+                                                    ? BisleriumColor
+                                                        .kPrimaryColor
+                                                    : BisleriumColor
+                                                        .backgroundColor,
                                               ),
                                               Text('${comment.voteCount ?? 0}'),
                                               IconButton(
                                                 onPressed: () {
-                                                  // Handle downvote button press
+                                                  setState(() {
+                                                    if (commentDislikes[
+                                                        comment.commentid]!) {
+                                                      comment.voteCount =
+                                                          (comment.voteCount ??
+                                                                  0) +
+                                                              1;
+                                                      commentDislikes[
+                                                          comment.commentid ??
+                                                              ""] = false;
+                                                      removeVote(
+                                                          null,
+                                                          comment.commentid,
+                                                          null);
+                                                    } else {
+                                                      comment.voteCount =
+                                                          (comment.voteCount ??
+                                                                  0) -
+                                                              1;
+                                                      commentDislikes[
+                                                          comment.commentid ??
+                                                              ""] = true;
+                                                      createVote(
+                                                          null,
+                                                          comment.commentid,
+                                                          null,
+                                                          0);
+                                                      if (commentLikes[
+                                                          comment.commentid]!) {
+                                                        comment.voteCount =
+                                                            (comment.voteCount ??
+                                                                    0) -
+                                                                1;
+                                                        commentLikes[
+                                                            comment.commentid ??
+                                                                ""] = false;
+                                                        updateVoteType(
+                                                            null,
+                                                            comment.commentid,
+                                                            null,
+                                                            0);
+                                                      }
+                                                    }
+                                                  });
                                                 },
                                                 icon: Icon(
                                                     Icons.thumb_down_sharp),
+                                                color: commentDislikes[
+                                                        comment.commentid]!
+                                                    ? BisleriumColor
+                                                        .kPrimaryColor
+                                                    : BisleriumColor
+                                                        .backgroundColor,
                                               ),
                                               Spacer(),
                                               FutureBuilder<String>(
@@ -685,6 +857,46 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
                                                               reply.content ??
                                                                   '',
                                                             ),
+                                                            Spacer(),
+                                                            FutureBuilder<
+                                                                String>(
+                                                              future:
+                                                                  getCurrentUsername(),
+                                                              builder: (context,
+                                                                  snapshot) {
+                                                                if (snapshot
+                                                                        .connectionState ==
+                                                                    ConnectionState
+                                                                        .done) {
+                                                                  final username =
+                                                                      snapshot
+                                                                          .data;
+                                                                  return Column(
+                                                                    children: [
+                                                                      if (username ==
+                                                                          comment
+                                                                              .author)
+                                                                        Row(
+                                                                          children: [
+                                                                            IconButton(
+                                                                              onPressed: () async {
+                                                                                String? replyId = reply.replyId;
+                                                                                bool yes = await deleteReplyOnPost(replyId);
+                                                                                if (yes) {
+                                                                                  _fetchPostData();
+                                                                                }
+                                                                              },
+                                                                              icon: Icon(Icons.delete),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                    ],
+                                                                  );
+                                                                } else {
+                                                                  return CircularProgressIndicator(); // Placeholder while fetching username
+                                                                }
+                                                              },
+                                                            ),
                                                           ],
                                                         ),
                                                       ],
@@ -714,23 +926,35 @@ class _BlogDetailsPage extends State<BlogDetailsPage> {
                                                             border: InputBorder
                                                                 .none,
                                                           ),
-                                                          // You can handle onChanged to update the reply text
-                                                          // controller: replyController,
+                                                          controller:
+                                                              _replyController,
                                                         ),
                                                       ),
                                                       SizedBox(width: 8),
                                                       TextButton(
-                                                        onPressed: () {
-                                                          // Handle submitting the reply
-                                                          // submitReply(replyController.text);
+                                                        onPressed: () async {
+                                                          String replyContext =
+                                                              _replyController
+                                                                  .text;
+                                                          bool sucess =
+                                                              await addReply(
+                                                                  comment
+                                                                      .commentid,
+                                                                  replyContext);
+                                                          if (sucess) {
+                                                            _fetchPostData();
+                                                          }
                                                         },
                                                         child: Text('Reply'),
                                                       ),
                                                       SizedBox(width: 8),
                                                       TextButton(
                                                         onPressed: () {
-                                                          // Handle canceling the reply
-                                                          // cancelReply();
+                                                          setState(() {
+                                                            comment.showReplies =
+                                                                !comment
+                                                                    .showReplies;
+                                                          });
                                                         },
                                                         child: Text('Cancel'),
                                                       ),

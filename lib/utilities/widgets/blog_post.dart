@@ -1,3 +1,7 @@
+import 'package:bisleriumbloggers/controllers/Vote/vote_apis.dart';
+import 'package:bisleriumbloggers/controllers/others/notification_apis.dart';
+import 'package:bisleriumbloggers/models/session/user_session.dart';
+import 'package:bisleriumbloggers/utilities/helpers/sesson_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:bisleriumbloggers/models/blog/blog.dart';
 import 'package:bisleriumbloggers/utilities/helpers/app_colors.dart';
@@ -20,6 +24,15 @@ class BlogPostCard extends StatefulWidget {
 class _BlogPostCardState extends State<BlogPostCard> {
   bool liked = false;
   bool disliked = false;
+  String? voteId;
+
+  Future<void> setNotification(String? postId) async {
+    final UserSession session = await getSessionOrThrow();
+    if (session.username != widget.blog.author) {
+      String notificationNote = "${session.username} have like your blog.";
+      await addNotification(postId, notificationNote);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,10 +131,15 @@ class _BlogPostCardState extends State<BlogPostCard> {
                                 widget.blog.voteCount =
                                     (widget.blog.voteCount ?? 0) + 1;
                                 disliked = false;
+                                updateVoteType(widget.blog.id, null, null, 1);
+                              } else {
+                                createVote(widget.blog.id, null, null, 1);
+                                setNotification(widget.blog.id);
                               }
                             } else {
                               widget.blog.voteCount =
                                   (widget.blog.voteCount ?? 0) - 1;
+                              removeVote(widget.blog.id, null, null);
                             }
                           });
                         },
@@ -141,10 +159,14 @@ class _BlogPostCardState extends State<BlogPostCard> {
                                 widget.blog.voteCount =
                                     (widget.blog.voteCount ?? 0) - 1;
                                 liked = false;
+                                updateVoteType(widget.blog.id, null, null, 0);
+                              } else {
+                                createVote(widget.blog.id, null, null, 0);
                               }
                             } else {
                               widget.blog.voteCount =
                                   (widget.blog.voteCount ?? 0) + 1;
+                              removeVote(widget.blog.id, null, null);
                             }
                           });
                         },
