@@ -135,7 +135,8 @@ class _LoginPage extends State<LoginPage> {
               const SizedBox(height: 15),
               GestureDetector(
                 onTap: () {
-                  GoRouter.of(context).push(Uri(path: '/username').toString());
+                  GoRouter.of(context)
+                      .push(Uri(path: '/password-email').toString());
                 },
                 child: const Text(
                   'Forgot Password ?',

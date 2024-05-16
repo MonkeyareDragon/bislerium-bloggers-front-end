@@ -58,25 +58,29 @@ Future<bool> removeVote(
 
 Future<bool> updateVoteType(
     String? postId, String? commentId, String? replyId, int newVoteType) async {
-  final UserSession session = await getSessionOrThrow();
-  final response = await http.put(
-    ApiUrlHelper.buildUrl('vote/update/'),
-    headers: <String, String>{
-      'Authorization': 'Bearer ${session.accessToken}',
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(<String, dynamic>{
-      "postId": postId,
-      'commentId': commentId,
-      'replyId': replyId,
-      "voteType": newVoteType
-    }),
-  );
+  try {
+    final UserSession session = await getSessionOrThrow();
+    final response = await http.put(
+      ApiUrlHelper.buildUrl('vote/update/'),
+      headers: <String, String>{
+        'Authorization': 'Bearer ${session.accessToken}',
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        "postId": postId,
+        'commentId': commentId,
+        'replyId': replyId,
+        "voteType": newVoteType
+      }),
+    );
 
-  if (response.statusCode == 200) {
-    print("update");
-    return true;
-  } else {
+    if (response.statusCode == 200) {
+      print("update");
+      return true;
+    } else {
+      return false;
+    }
+  } catch (e) {
     return false;
   }
 }

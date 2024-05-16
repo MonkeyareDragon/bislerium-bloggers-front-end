@@ -87,3 +87,39 @@ Future<bool> registerAdmin(String username, String email, String password,
     return false;
   }
 }
+
+Future<bool> forgotPassword(String email) async {
+  final response = await http.get(
+    ApiUrlHelper.buildUrl('api/Account/forgot-password/$email'),
+    headers: <String, String>{
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+Future<bool> changePassword(String userId, String token, String newPassword,
+    String confirmPassword) async {
+  final response = await http.post(
+    ApiUrlHelper.buildUrl(
+        'api/Account/change-password?userId=$userId&token=$token'),
+    headers: <String, String>{
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode(<String, String>{
+      "newPassword": newPassword,
+      "confirmPassword": confirmPassword
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    return true;
+  } else {
+    return false;
+  }
+}

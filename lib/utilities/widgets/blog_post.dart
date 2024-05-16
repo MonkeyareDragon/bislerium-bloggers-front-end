@@ -34,6 +34,15 @@ class _BlogPostCardState extends State<BlogPostCard> {
     }
   }
 
+  Future<String> getCurrentUsername() async {
+    try {
+      final UserSession session = await getSessionOrThrow();
+      return session.username;
+    } catch (e) {
+      return "";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -120,60 +129,117 @@ class _BlogPostCardState extends State<BlogPostCard> {
                       ),
                     ),
                     Spacer(),
-                    IconButton(
-                        onPressed: () {
-                          setState(() {
-                            liked = !liked;
-                            if (liked) {
-                              widget.blog.voteCount =
-                                  (widget.blog.voteCount ?? 0) + 1;
-                              if (disliked) {
-                                widget.blog.voteCount =
-                                    (widget.blog.voteCount ?? 0) + 1;
-                                disliked = false;
-                                updateVoteType(widget.blog.id, null, null, 1);
-                              } else {
-                                createVote(widget.blog.id, null, null, 1);
-                                setNotification(widget.blog.id);
-                              }
-                            } else {
-                              widget.blog.voteCount =
-                                  (widget.blog.voteCount ?? 0) - 1;
-                              removeVote(widget.blog.id, null, null);
-                            }
-                          });
-                        },
-                        icon: Icon(Icons.thumb_up_sharp),
-                        color: liked
-                            ? BisleriumColor.kPrimaryColor
-                            : BisleriumColor.backgroundColor),
-                    Text('${widget.blog.voteCount ?? 0}'),
-                    IconButton(
-                        onPressed: () {
-                          setState(() {
-                            disliked = !disliked;
-                            if (disliked) {
-                              widget.blog.voteCount =
-                                  (widget.blog.voteCount ?? 0) - 1;
-                              if (liked) {
-                                widget.blog.voteCount =
-                                    (widget.blog.voteCount ?? 0) - 1;
-                                liked = false;
-                                updateVoteType(widget.blog.id, null, null, 0);
-                              } else {
-                                createVote(widget.blog.id, null, null, 0);
-                              }
-                            } else {
-                              widget.blog.voteCount =
-                                  (widget.blog.voteCount ?? 0) + 1;
-                              removeVote(widget.blog.id, null, null);
-                            }
-                          });
-                        },
-                        icon: Icon(Icons.thumb_down_sharp),
-                        color: disliked
-                            ? BisleriumColor.kPrimaryColor
-                            : BisleriumColor.backgroundColor),
+                    FutureBuilder<String>(
+                      future: getCurrentUsername(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          final username = snapshot.data;
+                          return Row(
+                            children: [
+                              if (username!.isNotEmpty)
+                                Row(
+                                  children: [
+                                    IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            liked = !liked;
+                                            if (liked) {
+                                              widget.blog.voteCount =
+                                                  (widget.blog.voteCount ?? 0) +
+                                                      1;
+                                              if (disliked) {
+                                                updateVoteType(widget.blog.id,
+                                                    null, null, 1);
+                                                widget.blog.voteCount =
+                                                    (widget.blog.voteCount ??
+                                                            0) +
+                                                        1;
+                                                disliked = false;
+                                              } else {
+                                                createVote(widget.blog.id, null,
+                                                    null, 1);
+                                                setNotification(widget.blog.id);
+                                              }
+                                            } else {
+                                              widget.blog.voteCount =
+                                                  (widget.blog.voteCount ?? 0) -
+                                                      1;
+                                              removeVote(
+                                                  widget.blog.id, null, null);
+                                            }
+                                          });
+                                        },
+                                        icon: Icon(Icons.thumb_up_sharp),
+                                        color: liked
+                                            ? BisleriumColor.kPrimaryColor
+                                            : BisleriumColor.backgroundColor),
+                                    Text('${widget.blog.voteCount ?? 0}'),
+                                    IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            disliked = !disliked;
+                                            if (disliked) {
+                                              widget.blog.voteCount =
+                                                  (widget.blog.voteCount ?? 0) -
+                                                      1;
+                                              if (liked) {
+                                                updateVoteType(widget.blog.id,
+                                                    null, null, 0);
+                                                widget.blog.voteCount =
+                                                    (widget.blog.voteCount ??
+                                                            0) -
+                                                        1;
+                                                liked = false;
+                                              } else {
+                                                createVote(widget.blog.id, null,
+                                                    null, 0);
+                                              }
+                                            } else {
+                                              widget.blog.voteCount =
+                                                  (widget.blog.voteCount ?? 0) +
+                                                      1;
+                                              removeVote(
+                                                  widget.blog.id, null, null);
+                                            }
+                                          });
+                                        },
+                                        icon: Icon(Icons.thumb_down_sharp),
+                                        color: disliked
+                                            ? BisleriumColor.kPrimaryColor
+                                            : BisleriumColor.backgroundColor),
+                                  ],
+                                )
+                              else
+                                Row(
+                                  children: [
+                                    IconButton(
+                                        onPressed: () {
+                                          GoRouter.of(context).push(
+                                              Uri(path: '/login').toString());
+                                        },
+                                        icon: Icon(Icons.thumb_up_sharp),
+                                        color: liked
+                                            ? BisleriumColor.kPrimaryColor
+                                            : BisleriumColor.backgroundColor),
+                                    Text('${widget.blog.voteCount ?? 0}'),
+                                    IconButton(
+                                        onPressed: () {
+                                          GoRouter.of(context).push(
+                                              Uri(path: '/login').toString());
+                                        },
+                                        icon: Icon(Icons.thumb_down_sharp),
+                                        color: disliked
+                                            ? BisleriumColor.kPrimaryColor
+                                            : BisleriumColor.backgroundColor),
+                                  ],
+                                )
+                            ],
+                          );
+                        } else {
+                          return CircularProgressIndicator(); // Placeholder while fetching username
+                        }
+                      },
+                    ),
                     IconButton(
                       icon: SvgPicture.asset(
                           "assets/icons/feather_message-square.svg"),

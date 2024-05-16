@@ -1,14 +1,38 @@
+import 'package:bisleriumbloggers/controllers/Authentication/auth_apis.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class PasswordChangePage extends StatefulWidget {
+  final String userId;
+  final String token;
+  const PasswordChangePage({
+    Key? key,
+    required this.userId,
+    required this.token,
+  }) : super(key: key);
+
   @override
   _PasswordChangePageState createState() => _PasswordChangePageState();
 }
 
 class _PasswordChangePageState extends State<PasswordChangePage> {
   final _formKey = GlobalKey<FormState>();
-  String _newPassword = '';
-  String _confirmPassword = '';
+  late TextEditingController _newPasswordController;
+  late TextEditingController _confirmPasswordController;
+
+  @override
+  void initState() {
+    super.initState();
+    _newPasswordController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +48,7 @@ class _PasswordChangePageState extends State<PasswordChangePage> {
             children: [
               SizedBox(height: 20.0),
               TextFormField(
+                controller: _newPasswordController,
                 decoration: InputDecoration(
                   labelText: 'New Password',
                   border: OutlineInputBorder(),
@@ -34,10 +59,10 @@ class _PasswordChangePageState extends State<PasswordChangePage> {
                   }
                   return null;
                 },
-                onSaved: (value) => _newPassword = value!,
               ),
               SizedBox(height: 20.0),
               TextFormField(
+                controller: _confirmPasswordController,
                 decoration: InputDecoration(
                   labelText: 'Confirm Password',
                   border: OutlineInputBorder(),
@@ -45,19 +70,25 @@ class _PasswordChangePageState extends State<PasswordChangePage> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please confirm your new password';
-                  } else if (value != _newPassword) {
+                  } else if (value != _newPasswordController.text) {
                     return 'Passwords do not match';
                   }
                   return null;
                 },
-                onSaved: (value) => _confirmPassword = value!,
               ),
               SizedBox(height: 40.0),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-                    // TODO: Implement password change logic here
+                    String newPassword = _newPasswordController.text.trim();
+                    String confirmPassword =
+                        _confirmPasswordController.text.trim();
+                    bool sucess = await changePassword(widget.userId,
+                        widget.token, newPassword, confirmPassword);
+
+                    if (sucess) {
+                      GoRouter.of(context).push(Uri(path: '/login').toString());
+                    }
                   }
                 },
                 child: Text('Change Password'),

@@ -2,9 +2,11 @@ import 'package:bisleriumbloggers/screens/Admin/access_denial%20_page.dart';
 import 'package:bisleriumbloggers/screens/Admin/add_admin.dart';
 import 'package:bisleriumbloggers/screens/Admin/admin_page.dart';
 import 'package:bisleriumbloggers/screens/Admin/successfull_admin_create.dart';
+import 'package:bisleriumbloggers/screens/Authentication/forgot_email_page.dart';
 import 'package:bisleriumbloggers/screens/Authentication/login_page.dart';
 import 'package:bisleriumbloggers/screens/Authentication/set_username_page.dart';
 import 'package:bisleriumbloggers/screens/Authentication/signup_page.dart';
+import 'package:bisleriumbloggers/screens/Authentication/successfull_email_page.dart';
 import 'package:bisleriumbloggers/screens/Blog/add_post.dart';
 import 'package:bisleriumbloggers/screens/Blog/blog_details_page.dart';
 import 'package:bisleriumbloggers/screens/Blog/blog_page.dart';
@@ -103,9 +105,12 @@ class AppRouter {
         ),
         GoRoute(
           name: AppRouteConstants.passwordChangeRouteName,
-          path: '/password-change',
+          path: '/password-change/:userid/:token',
           pageBuilder: (context, state) {
-            return MaterialPage(child: PasswordChangePage());
+            return MaterialPage(
+                child: PasswordChangePage(
+                    userId: state.params['userid']!,
+                    token: state.params['token']!));
           },
         ),
         GoRoute(
@@ -137,6 +142,20 @@ class AppRouter {
           path: '/admin-create/success',
           pageBuilder: (context, state) {
             return MaterialPage(child: SuccessAdminCreationPage());
+          },
+        ),
+        GoRoute(
+          name: AppRouteConstants.confirmEmailResetRouteName,
+          path: '/password-email',
+          pageBuilder: (context, state) {
+            return const MaterialPage(child: ForgotPasswordPage());
+          },
+        ),
+        GoRoute(
+          name: AppRouteConstants.emailSendResetRouteName,
+          path: '/email-send',
+          pageBuilder: (context, state) {
+            return const MaterialPage(child: SucessEmailPage());
           },
         ),
         //Test
